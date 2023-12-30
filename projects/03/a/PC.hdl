@@ -18,5 +18,24 @@ CHIP PC {
     OUT out[16];
     
     PARTS:
-    //// Replace this comment with your code.
+    // Increment previous value
+    Inc16(in=outReg, out=incReg);
+
+    // Load new value
+    // (set input pin on Mux to in)
+
+    // Reset previous value
+    // (set input pin on Mux to false)
+    Mux8Way16(a=outReg, b=incReg, c=in, d=in, e=false, f=false, g=false, h=false, sel[0]=inc, sel[1]=load, sel[2]=reset, out=next);
+    Register(in=next, load=true, out=out, out=outReg);
 }
+
+// Mux8Way16 sel pin settings:
+// 000 a
+// 001 b
+// 010 c
+// 011 d
+// 100 e
+// 101 f
+// 110 g
+// 111 h
