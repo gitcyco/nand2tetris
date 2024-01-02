@@ -5,10 +5,10 @@
 
 // Runs an infinite loop that listens to the keyboard input.
 // When a key is pressed (any key), the program blackens the screen
-// by writing 'black' in every pixel;
+// by writing 'black' in every pixel (set whole word to -1, all bits 1)
 // the screen should remain fully black as long as the key is pressed. 
 // When no key is pressed, the program clears the screen by writing
-// 'white' in every pixel;
+// 'white' in every pixel (set whole word to 0, all bits 0)
 // the screen should remain fully clear as long as no key is pressed.
 
 // Implement:
