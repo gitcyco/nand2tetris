@@ -19,5 +19,24 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    //// Replace this comment with your code.
+    // SEL: 00/01 -> RAM, 10 -> SCR, 11 -> KBD
+    DMux4Way(in=load, sel=address[13..14], a=loadRAMA, b=loadRAMB, c=loadSCR, d=loadKBD);
+    Or(a=loadRAMA, b=loadRAMB, out=loadRAM);
+
+    // Main ram:   0x0000 -> 0x3FFF / 0000000000000000 -> 0011111111111111
+    RAM16K(in=in, load=loadRAM, address[13]=address[13], address[0..12]=address[0..12], out=outRAM);
+
+    // Screen mem: 0x4000 -> 0x5FFF / 0100000000000000 -> 0101111111111111
+    Screen(in=in, load=loadSCR, address=address[0..12], out=outSCR);
+    
+    // KBD mem:    0x6000           / 0110000000000000    0110000000000000
+    Keyboard(out=outKBD);
+
+    // SEL: 00/01 -> RAM, 10 -> SCR, 11 -> KBD
+    Mux4Way16(a=outRAM, b=outRAM, c=outSCR, d=outKBD, sel=address[13..14], out=out);
 }
+
+// TYP  SEL ADDRESS          SEL ADDRESS
+// RAM: 000 0000000000000 -> 001 1111111111111
+// SCR: 010 0000000000000 -> 010 1111111111111
+// KBD: 011 0000000000000    011 0000000000000
