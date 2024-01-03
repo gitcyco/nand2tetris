@@ -1,22 +1,51 @@
 const fs = require("node:fs");
+const path = require("node:path");
+const { parseArgs } = require("node:util");
 
 // Demo file for testing
-const inputFile = "./Max.asm";
+// const inputFile = "./Add.asm";
 
-init();
+const args = parseArgs({
+  options: {
+    help: {
+      type: "boolean",
+      default: false,
+      short: "h",
+    },
+    output: {
+      type: "string",
+      default: "",
+      short: "o",
+    },
+  },
+  strict: false,
+});
 
-function init() {
+if (args.positionals.length === 0) {
+  console.error("ERROR: please provide input filename");
+  process.exit(1);
+}
+
+const inputFile = args.positionals[0];
+
+parseInput(inputFile);
+
+function parseInput(inputFile) {
   let input = getRawFile(inputFile);
   let src = stripInput(input);
-  // console.log("source:", src);
   const { symbols, source } = buildSymbols(src);
-  console.log("symbols:", symbols);
-  console.log("source:", source);
+  // console.log("symbols:", symbols);
+  // console.log("source:", source);
 
   const processed = processCommands(source, symbols);
-  console.log("Processed:", processed);
+  // console.log("Processed:", processed);
   const assembled = assemble(processed);
-  console.log(assembled);
+  // console.log(assembled);
+  const assembledFile = path.parse(inputFile);
+  assembledFile.ext = "hack";
+  assembledFile.base = "";
+  console.log("WRITING:", path.format(assembledFile), assembledFile);
+  fs.writeFileSync(path.format(assembledFile), assembled.join("\n"));
 }
 
 // comp:
@@ -71,7 +100,6 @@ function assemble(commands) {
 }
 
 function assembleACommand(cmd) {
-  console.log("assembling A:", cmd);
   return cmd.address.toString(2).padStart(16, "0");
 }
 

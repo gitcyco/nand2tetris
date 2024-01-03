@@ -28,13 +28,3 @@
 (END)
    @END
    0;JMP
-
-   // these are fake instructions for testing:
-   @n
-   @i
-   @j
-   @n
-   @n
-   @j
-   @i
-   
