@@ -27,9 +27,14 @@ class VMTranslator {
     };
     this.rawFile = this.getRawFile(file);
     this.ast = this.processCommands(this.stripInput(this.rawFile));
-    this.assembly = this.translate(this.ast);
+    this.assembly = this.translate(this.ast).join("\n");
     console.log("AST:", this.ast);
-    console.log("ASSEMBLY:", this.assembly.join("\n"));
+    console.log("ASSEMBLY:", this.assembly);
+    const assembledFile = path.parse(file);
+    assembledFile.ext = "asm";
+    assembledFile.base = "";
+    console.log("WRITING:", path.format(assembledFile), assembledFile);
+    fs.writeFileSync(path.format(assembledFile), this.assembly);
   }
 
   translate(ast) {
@@ -42,8 +47,34 @@ class VMTranslator {
           break;
         case "push":
           this.push(item.register, item.offset, assembly);
+          break;
         case "add":
           this.add(assembly);
+          break;
+        case "sub":
+          this.sub(assembly);
+          break;
+        case "and":
+          this.and(assembly);
+          break;
+        case "or":
+          this.or(assembly);
+          break;
+        case "not":
+          this.not(assembly);
+          break;
+        case "neg":
+          this.neg(assembly);
+          break;
+        case "eq":
+          this.equal(assembly);
+          break;
+        case "lt":
+          this.lessThan(assembly);
+          break;
+        case "gt":
+          this.greaterThan(assembly);
+          break;
         default:
           break;
       }
@@ -241,6 +272,13 @@ class VMTranslator {
       case "THIS":
       case "THAT":
         assembly.push(`@${register}`);
+        assembly.push(`D=M`);
+        assembly.push(`@${offset}`);
+        assembly.push(`D=D+A`);
+        assembly.push(`@R13`);
+        assembly.push(`M=D`);
+
+        assembly.push(`@R13`);
         assembly.push(`A=M`);
         assembly.push(`D=M`);
         assembly.push(`@SP`);
@@ -248,6 +286,15 @@ class VMTranslator {
         assembly.push(`M=D`);
         assembly.push(`@SP`);
         assembly.push(`M=M+1`);
+
+        // assembly.push(`@${register}`);
+        // assembly.push(`A=M`);
+        // assembly.push(`D=M`);
+        // assembly.push(`@SP`);
+        // assembly.push(`A=M`);
+        // assembly.push(`M=D`);
+        // assembly.push(`@SP`);
+        // assembly.push(`M=M+1`);
         break;
       case "STATIC":
         assembly.push(`@${this.rootName}.${offset}`);
@@ -259,7 +306,7 @@ class VMTranslator {
         assembly.push(`M=M+1`);
         break;
       case "TEMP":
-        assembly.push(`@${5 + offset}`);
+        assembly.push(`@${parseInt(5 + +offset)}`);
         assembly.push(`D=M`);
         assembly.push(`@SP`);
         assembly.push(`A=M`);
@@ -300,12 +347,13 @@ class VMTranslator {
         assembly.push(`@SP`);
         assembly.push(`M=M-1`);
         assembly.push(`@${register}`);
-        assembly.push(`D=A`);
+        assembly.push(`D=M`);
         assembly.push(`@${offset}`);
         assembly.push(`D=D+A`);
         assembly.push(`@R13`);
         assembly.push(`M=D`);
         assembly.push(`@SP`);
+        assembly.push(`A=M`);
         assembly.push(`D=M`);
         assembly.push(`@R13`);
         assembly.push(`A=M`);
@@ -314,6 +362,7 @@ class VMTranslator {
       case "STATIC":
         assembly.push(`@SP`);
         assembly.push(`M=M-1`);
+        assembly.push(`A=M`);
         assembly.push(`D=M`);
         assembly.push(`@${this.rootName}.${offset}`);
         assembly.push(`M=D`);
@@ -321,8 +370,9 @@ class VMTranslator {
       case "TEMP":
         assembly.push(`@SP`);
         assembly.push(`M=M-1`);
+        assembly.push(`A=M`);
         assembly.push(`D=M`);
-        assembly.push(`@${5 + offset}`);
+        assembly.push(`@${5 + +offset}`);
         assembly.push(`M=D`);
         break;
       case "CONSTANT":
@@ -345,7 +395,7 @@ class VMTranslator {
           {
             let [register, offset] = rest;
             register = this.symbolMap[register.toUpperCase()];
-            const obj = { command, register, offset, source: item };
+            const obj = { command, register, offset: +offset, source: item };
             ast.push(obj);
           }
           break;
