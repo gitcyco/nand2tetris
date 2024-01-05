@@ -74,11 +74,79 @@ class VMTranslator {
     assembly.push(`@SP`);
     assembly.push(`M=M+1`);
   }
+  and(assembly) {
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`D=M`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`M=D&M`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M+1`);
+  }
+  or(assembly) {
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`D=M`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`M=D|M`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M+1`);
+  }
+  not(assembly) {
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`!M`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M+1`);
+  }
   neg(assembly) {
     assembly.push(`@SP`);
     assembly.push(`M=M-1`);
     assembly.push(`A=M`);
     assembly.push(`-M`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M+1`);
+  }
+  equal(assembly) {
+    // Move y into R13
+    // Move x into D
+    // Move R13 into A
+    // Set *SP to -1
+    // Do D - A
+    // Jump if zero to eqJumpLabel
+    // Set *SP to 0
+    // eqJumpLabel:
+    // SP + 1
+    // (x === y)
+    //
+    const eqJumpLabel = `eqJMP${this.eqJMPNum++}`;
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`D=M`);
+    assembly.push(`@R13`);
+    assembly.push(`M=D`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`D=M`);
+    assembly.push(`M=-1`);
+    assembly.push(`@R13`);
+    assembly.push(`A=M`);
+    assembly.push(`D=D-A`);
+    assembly.push(`@${eqJumpLabel}`);
+    assembly.push(`D:JEQ`);
+    assembly.push(`@SP`);
+    assembly.push(`A=M`);
+    assembly.push(`M=0`);
+    assembly.push(`(${eqJumpLabel})`);
     assembly.push(`@SP`);
     assembly.push(`M=M+1`);
   }
