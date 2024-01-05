@@ -18,6 +18,7 @@ class VMTranslator {
       R14: "R14",
       R15: "R15",
       CONSTANT: "CONSTANT",
+      STATIC: "STATIC",
     };
     this.rawFile = this.getRawFile(file);
     this.ast = this.processCommands(this.stripInput(this.rawFile));
@@ -32,7 +33,27 @@ class VMTranslator {
     return assembly;
   }
 
-  pop(register, offset) {}
+  pop(register, offset) {
+    const assembly = [];
+    switch (register) {
+      case "LCL":
+      case "ARG":
+      case "THIS":
+      case "THAT":
+      case "R13":
+      case "R14":
+      case "R15":
+        break;
+      case "TEMP":
+        // IMPLEMENT TEMP
+        break;
+      case "CONSTANT":
+        // IMPLEMENT CONSTANT
+        break;
+      default:
+        break;
+    }
+  }
 
   processCommands(input) {
     const ast = [];
