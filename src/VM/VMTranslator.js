@@ -10,75 +10,183 @@ class VMTranslator {
     this.gtJMPNum = 0;
     this.ltJMPNum = 0;
     this.staticNum = 0;
-    this.rA = "__temp_register_A";
-    this.rB = "__temp_register_B";
+    // this.rA = this.rootName + "__temp_register_A";
+    // this.rB = this.rootName + "__temp_register_B";
     this.symbolMap = {
       LOCAL: "LCL",
       ARGUMENT: "ARG",
       THIS: "THIS",
       THAT: "THAT",
       TEMP: "TEMP",
-      R13: "R13",
-      R14: "R14",
-      R15: "R15",
+      // R13: "R13",
+      // R14: "R14",
+      // R15: "R15",
       CONSTANT: "CONSTANT",
       STATIC: "STATIC",
+      POINTER: "POINTER",
     };
     this.rawFile = this.getRawFile(file);
     this.ast = this.processCommands(this.stripInput(this.rawFile));
     this.assembly = this.translate(this.ast);
     console.log("AST:", this.ast);
-    console.log("ASSEMBLY:", this.assembly);
+    console.log("ASSEMBLY:", this.assembly.join("\n"));
   }
 
   translate(ast) {
     const assembly = [];
     for (let item of ast) {
+      assembly.push(`// ${item.source}`);
       switch (item.command) {
         case "pop":
-          assembly.push(this.pop(item.register, item.offset, item.source));
+          this.pop(item.register, item.offset, assembly);
           break;
-
+        case "push":
+          this.push(item.register, item.offset, assembly);
+        case "add":
+          this.add(assembly);
         default:
           break;
       }
     }
     return assembly;
   }
-
-  pop(register, offset, source) {
-    const assembly = [];
+  add(assembly) {
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`D=M`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`M=D+M`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M+1`);
+  }
+  sub(assembly) {
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`D=M`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`M=M-D`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M+1`);
+  }
+  neg(assembly) {
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`-M`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M+1`);
+  }
+  push(register, offset, assembly) {
     switch (register) {
+      case "POINTER":
+        if (register === "POINTER") {
+          register = offset === 0 ? "THIS" : "THAT";
+        }
+        assembly.push(`@${register}`);
+        assembly.push(`D=M`);
+        assembly.push(`@SP`);
+        assembly.push(`A=M`);
+        assembly.push(`M=D`);
+        assembly.push(`@SP`);
+        assembly.push(`M=M+1`);
+        break;
       case "LCL":
       case "ARG":
       case "THIS":
       case "THAT":
-      case "R13":
-      case "R14":
-      case "R15":
-        assembly.push(`// ${source}`);
+        assembly.push(`@${register}`);
+        assembly.push(`A=M`);
+        assembly.push(`D=M`);
+        assembly.push(`@SP`);
+        assembly.push(`A=M`);
+        assembly.push(`M=D`);
+        assembly.push(`@SP`);
+        assembly.push(`M=M+1`);
+        break;
+      case "STATIC":
+        assembly.push(`@${this.rootName}.${offset}`);
+        assembly.push(`D=M`);
+        assembly.push(`@SP`);
+        assembly.push(`A=M`);
+        assembly.push(`M=D`);
+        assembly.push(`@SP`);
+        assembly.push(`M=M+1`);
+        break;
+      case "TEMP":
+        assembly.push(`@${5 + offset}`);
+        assembly.push(`D=M`);
+        assembly.push(`@SP`);
+        assembly.push(`A=M`);
+        assembly.push(`M=D`);
+        assembly.push(`@SP`);
+        assembly.push(`M=M+1`);
+        break;
+      case "CONSTANT":
+        assembly.push(`@${offset}`);
+        assembly.push(`D=A`);
+        assembly.push(`@SP`);
+        assembly.push(`A=M`);
+        assembly.push(`M=D`);
+        assembly.push(`@SP`);
+        assembly.push(`M=M+1`);
+        break;
+      default:
+        break;
+    }
+  }
+
+  pop(register, offset, assembly) {
+    // const assembly = [];
+    switch (register) {
+      case "POINTER":
+        register = offset === 0 ? "THIS" : "THAT";
+        assembly.push(`@SP`);
+        assembly.push(`M=M-1`);
+        assembly.push(`A=M`);
+        assembly.push(`D=M`);
+        assembly.push(`@${register}`);
+        assembly.push(`M=D`);
+        break;
+      case "LCL":
+      case "ARG":
+      case "THIS":
+      case "THAT":
         assembly.push(`@SP`);
         assembly.push(`M=M-1`);
         assembly.push(`@${register}`);
         assembly.push(`D=A`);
         assembly.push(`@${offset}`);
         assembly.push(`D=D+A`);
-        assembly.push(`@${this.rA}`);
+        assembly.push(`@R13`);
         assembly.push(`M=D`);
         assembly.push(`@SP`);
         assembly.push(`D=M`);
-        assembly.push(`@${this.rA}`);
+        assembly.push(`@R13`);
         assembly.push(`A=M`);
         assembly.push(`M=D`);
         break;
       case "STATIC":
-        // IMPLEMENT STATIC
+        assembly.push(`@SP`);
+        assembly.push(`M=M-1`);
+        assembly.push(`D=M`);
+        assembly.push(`@${this.rootName}.${offset}`);
+        assembly.push(`M=D`);
         break;
       case "TEMP":
-        // IMPLEMENT TEMP
+        assembly.push(`@SP`);
+        assembly.push(`M=M-1`);
+        assembly.push(`D=M`);
+        assembly.push(`@${5 + offset}`);
+        assembly.push(`M=D`);
         break;
       case "CONSTANT":
-        // IMPLEMENT CONSTANT
+        throw new SyntaxError(`Invalid POP to constant: ${register} ${offset}`);
         break;
       default:
         break;
