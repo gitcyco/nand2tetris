@@ -126,7 +126,7 @@ class VMTranslator {
     // SP + 1
     // (x === y)
     //
-    const eqJumpLabel = `eqJMP${this.eqJMPNum++}`;
+    const eqJumpLabel = `${this.rootName}_eqJMP${this.eqJMPNum++}`;
     assembly.push(`@SP`);
     assembly.push(`M=M-1`);
     assembly.push(`A=M`);
@@ -147,6 +147,78 @@ class VMTranslator {
     assembly.push(`A=M`);
     assembly.push(`M=0`);
     assembly.push(`(${eqJumpLabel})`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M+1`);
+  }
+  lessThan(assembly) {
+    // Move y into R13
+    // Move x into D
+    // Move R13 into A
+    // Set *SP to -1
+    // Do D - A
+    // Jump if less than zero to eqJumpLabel
+    // Set *SP to 0
+    // eqJumpLabel:
+    // SP + 1
+    // (x === y)
+    //
+    const ltJumpLabel = `${this.rootName}_ltJMP${this.ltJMPNum++}`;
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`D=M`);
+    assembly.push(`@R13`);
+    assembly.push(`M=D`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`D=M`);
+    assembly.push(`M=-1`);
+    assembly.push(`@R13`);
+    assembly.push(`A=M`);
+    assembly.push(`D=D-A`);
+    assembly.push(`@${ltJumpLabel}`);
+    assembly.push(`D:JLT`);
+    assembly.push(`@SP`);
+    assembly.push(`A=M`);
+    assembly.push(`M=0`);
+    assembly.push(`(${ltJumpLabel})`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M+1`);
+  }
+  greaterThan(assembly) {
+    // Move y into R13
+    // Move x into D
+    // Move R13 into A
+    // Set *SP to -1
+    // Do D - A
+    // Jump if greater than zero to eqJumpLabel
+    // Set *SP to 0
+    // eqJumpLabel:
+    // SP + 1
+    // (x === y)
+    //
+    const ltJumpLabel = `${this.rootName}_ltJMP${this.ltJMPNum++}`;
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`D=M`);
+    assembly.push(`@R13`);
+    assembly.push(`M=D`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`D=M`);
+    assembly.push(`M=-1`);
+    assembly.push(`@R13`);
+    assembly.push(`A=M`);
+    assembly.push(`D=D-A`);
+    assembly.push(`@${ltJumpLabel}`);
+    assembly.push(`D:JGT`);
+    assembly.push(`@SP`);
+    assembly.push(`A=M`);
+    assembly.push(`M=0`);
+    assembly.push(`(${ltJumpLabel})`);
     assembly.push(`@SP`);
     assembly.push(`M=M+1`);
   }
