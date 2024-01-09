@@ -5,13 +5,11 @@ const path = require("node:path");
 
 class VMTranslator {
   constructor(file) {
-    this.rootName = path.basename(file, ".vm");
+    this.className = path.basename(file, ".vm");
     this.eqJMPNum = 0;
     this.gtJMPNum = 0;
     this.ltJMPNum = 0;
     this.staticNum = 0;
-    // this.rA = this.rootName + "__temp_register_A";
-    // this.rB = this.rootName + "__temp_register_B";
     this.symbolMap = {
       LOCAL: "LCL",
       ARGUMENT: "ARG",
@@ -33,7 +31,7 @@ class VMTranslator {
     assembledFile.base = "";
     // console.log("WRITING:", path.format(assembledFile), assembledFile);
     const newFile = file.replace(/\.vm$/, ".asm");
-    fs.writeFileSync(newFile, this.assembly);
+    // fs.writeFileSync(newFile, this.assembly);
     // fs.writeFileSync(path.format(assembledFile), this.assembly);
   }
 
@@ -136,8 +134,8 @@ class VMTranslator {
     if (op === "eq") operator = `D;JEQ`;
     else if (op === "lt") operator = `D;JLT`;
     else operator = `D;JGT`;
-    const eqJumpLabel = `${this.rootName}_JMP${this.eqJMPNum++}_${op}`;
-    const endLabel = `${this.rootName}_END${this.eqJMPNum++}_${op}`;
+    const eqJumpLabel = `${this.className}_JMP${this.eqJMPNum++}_${op}`;
+    const endLabel = `${this.className}_END${this.eqJMPNum++}_${op}`;
     assembly.push(`@SP`);
     assembly.push(`M=M-1`);
     assembly.push(`A=M`);
@@ -212,7 +210,7 @@ class VMTranslator {
         assembly.push(`M=M+1`);
         break;
       case "STATIC":
-        assembly.push(`@${this.rootName}.${offset}`);
+        assembly.push(`@${this.className}.${offset}`);
         assembly.push(`D=M`);
         assembly.push(`@SP`);
         assembly.push(`A=M`);
@@ -278,7 +276,7 @@ class VMTranslator {
         assembly.push(`M=M-1`);
         assembly.push(`A=M`);
         assembly.push(`D=M`);
-        assembly.push(`@${this.rootName}.${offset}`);
+        assembly.push(`@${this.className}.${offset}`);
         assembly.push(`M=D`);
         break;
       case "TEMP":
@@ -303,14 +301,51 @@ class VMTranslator {
     for (let item of input) {
       let [command, ...rest] = item.split(" ");
       switch (command) {
+        case "goto":
+        case "if-goto":
+          {
+            const [label] = rest;
+            const obj = { command, label, class: this.className };
+          }
+          break;
+        case "function":
+          {
+            const [name, nVars] = rest;
+            const obj = { command, name, nVars: +nVars, class: this.className };
+            ast.push(obj);
+          }
+          break;
+        case "call":
+          {
+            const [name, nArgs] = rest;
+            const obj = { command, name, nArgs: +nArgs, class: this.className };
+          }
+          break;
+        case "return":
+          {
+            const obj = { command, class: this.className };
+            ast.push(obj);
+          }
+          break;
         case "label":
+          {
+            const [name] = rest;
+            const obj = { command, name, class: this.className };
+            ast.push(obj);
+          }
           break;
         case "push":
         case "pop":
           {
             let [register, offset] = rest;
             register = this.symbolMap[register.toUpperCase()];
-            const obj = { command, register, offset: +offset, source: item };
+            const obj = {
+              command,
+              register,
+              offset: +offset,
+              source: item,
+              class: this.className,
+            };
             ast.push(obj);
           }
           break;
@@ -324,7 +359,7 @@ class VMTranslator {
         case "or":
         case "not":
           {
-            const obj = { command, source: item };
+            const obj = { command, source: item, class: this.className };
             ast.push(obj);
           }
           break;
@@ -385,5 +420,36 @@ class VMTranslator {
 
 // const inputFile = args.positionals[0];
 
+function processInput(input, files) {
+  for (let file of files) {
+    const vm = new VMTranslator(input + "/" + file);
+
+    const assembledFile = path.parse(file);
+    assembledFile.ext = "asm";
+    assembledFile.base = "";
+    // console.log("WRITING:", path.format(assembledFile), assembledFile);
+    const newFile = file.replace(/\.vm$/, ".asm");
+    // fs.appendFileSync(newFile, )
+    console.log("ASSEMBLING FILE:", file, vm.assembly);
+  }
+}
+
 const inputFile = process.argv[2];
-const vm = new VMTranslator(inputFile);
+let isDir = fs.existsSync(inputFile) && fs.lstatSync(inputFile).isDirectory();
+let files = [];
+if (isDir) {
+  files = fs.readdirSync(inputFile).filter((e) => /\.vm$/.test(e));
+} else {
+  files.push(inputFile);
+}
+console.log("input is:", files);
+
+if (files.length > 0) {
+  // const vm = new VMTranslator(inputFile);
+  processInput(inputFile, files);
+} else {
+  console.error(
+    "Must supply either directory containing vm files or a vm file."
+  );
+  process.exit(1);
+}
