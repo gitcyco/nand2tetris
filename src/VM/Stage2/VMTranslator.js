@@ -37,45 +37,39 @@ class VMTranslator {
 
   translate(ast) {
     const assembly = [];
+    let functionName = "";
     for (let item of ast) {
       assembly.push(`// ${item.source}`);
       switch (item.command) {
+        case "label":
+          // Format: (Class.Function$Label)
+          this.label(assembly, item, functionName);
+          break;
+        case "goto":
+          this.goto(assembly, item, functionName);
+          break;
         case "pop":
-          this.pop(item.register, item.offset, assembly);
+          this.pop(item.register, item.offset, assembly, functionName);
           break;
         case "push":
-          this.push(item.register, item.offset, assembly);
+          this.push(item.register, item.offset, assembly, functionName);
           break;
         case "add":
-        // this.add(assembly);
-        // break;
         case "sub":
-          // this.sub(assembly);
-          this.addSub(assembly, item.command);
+          this.addSub(assembly, item.command, functionName);
           break;
         case "and":
-        // this.and(assembly);
-        // break;
         case "or":
-          // this.or(assembly);
-          this.andOr(assembly, item.command);
+          this.andOr(assembly, item.command, functionName);
           break;
         case "not":
-        // this.not(assembly);
-        // break;
         case "neg":
-          // this.neg(assembly);
-          this.notNeg(assembly, item.command);
+          this.notNeg(assembly, item.command, functionName);
           break;
         case "eq":
-        // this.equal(assembly);
-        // break;
         case "lt":
-        // this.lessThan(assembly);
-        // break;
         case "gt":
-          // this.greaterThan(assembly);
-          this.eqLtGt(assembly, item.command);
+          this.eqLtGt(assembly, item.command, functionName);
           break;
         default:
           break;
@@ -83,7 +77,14 @@ class VMTranslator {
     }
     return assembly;
   }
-  addSub(assembly, op) {
+  label(assembly, item, functionName) {
+    assembly.push(`(${item.class}.${functionName}$${item.label})`);
+  }
+  goto(assembly, item, functionName) {
+    assembly.push(`@${item.class}.${functionName}$${item.label}`);
+    assembly.push(`0;JMP`);
+  }
+  addSub(assembly, op, functionName) {
     assembly.push(`@SP`);
     assembly.push(`M=M-1`);
     assembly.push(`A=M`);
@@ -96,7 +97,7 @@ class VMTranslator {
     assembly.push(`@SP`);
     assembly.push(`M=M+1`);
   }
-  andOr(assembly, op) {
+  andOr(assembly, op, functionName) {
     assembly.push(`@SP`);
     assembly.push(`M=M-1`);
     assembly.push(`A=M`);
@@ -109,7 +110,7 @@ class VMTranslator {
     assembly.push(`@SP`);
     assembly.push(`M=M+1`);
   }
-  notNeg(assembly, op) {
+  notNeg(assembly, op, functionName) {
     assembly.push(`@SP`);
     assembly.push(`M=M-1`);
     assembly.push(`A=M`);
@@ -118,7 +119,7 @@ class VMTranslator {
     assembly.push(`@SP`);
     assembly.push(`M=M+1`);
   }
-  eqLtGt(assembly, op) {
+  eqLtGt(assembly, op, functionName) {
     // Move y into R13
     // Move x into D
     // Move R13 into A
@@ -175,7 +176,7 @@ class VMTranslator {
     assembly.push(`M=M+1`);
   }
 
-  push(register, offset, assembly) {
+  push(register, offset, assembly, functionName) {
     switch (register) {
       case "POINTER":
         if (register === "POINTER") {
@@ -241,7 +242,7 @@ class VMTranslator {
     }
   }
 
-  pop(register, offset, assembly) {
+  pop(register, offset, assembly, functionName) {
     switch (register) {
       case "POINTER":
         register = offset === 0 ? "THIS" : "THAT";
