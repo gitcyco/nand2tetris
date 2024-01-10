@@ -34,15 +34,116 @@ class VMTranslator {
     // fs.writeFileSync(newFile, this.assembly);
     // fs.writeFileSync(path.format(assembledFile), this.assembly);
   }
-
+  processCommands(input) {
+    const ast = [];
+    for (let item of input) {
+      let [command, ...rest] = item.split(" ");
+      switch (command) {
+        case "goto":
+        case "if-goto":
+          {
+            const [label] = rest;
+            const obj = { command, label, source: item, class: this.className };
+            ast.push(obj);
+          }
+          break;
+        case "function":
+          {
+            const [name, nVars] = rest;
+            const obj = {
+              command,
+              name,
+              source: item,
+              nVars: +nVars,
+              class: this.className,
+            };
+            ast.push(obj);
+          }
+          break;
+        case "call":
+          {
+            const [name, nArgs] = rest;
+            const obj = {
+              command,
+              name,
+              source: item,
+              nArgs: +nArgs,
+              class: this.className,
+            };
+          }
+          break;
+        case "return":
+          {
+            const obj = { command, source: item, class: this.className };
+            ast.push(obj);
+          }
+          break;
+        case "label":
+          {
+            const [name] = rest;
+            const obj = { command, name, source: item, class: this.className };
+            ast.push(obj);
+          }
+          break;
+        case "push":
+        case "pop":
+          {
+            let [register, offset] = rest;
+            register = this.symbolMap[register.toUpperCase()];
+            const obj = {
+              command,
+              register,
+              offset: +offset,
+              source: item,
+              class: this.className,
+            };
+            ast.push(obj);
+          }
+          break;
+        case "add":
+        case "sub":
+        case "neg":
+        case "eq":
+        case "gt":
+        case "lt":
+        case "and":
+        case "or":
+        case "not":
+          {
+            const obj = { command, source: item, class: this.className };
+            ast.push(obj);
+          }
+          break;
+        default:
+          console.error(`Unknown command: ${item}`);
+          process.exit(1);
+          break;
+      }
+    }
+    return ast;
+  }
   translate(ast) {
     const assembly = [];
     let functionName = "";
+    let returnNum = 0;
     for (let item of ast) {
-      assembly.push(`// ${item.source}`);
+      assembly.push(`\n// ${item.source}`);
       switch (item.command) {
+        case "return":
+          break;
+        case "call":
+          this.callDef(assembly, item, returnNum++);
+          break;
+        case "function":
+          functionName = item.name;
+          returnNum = 0;
+          console.log("FUNCTION DEF:\n", item);
+          this.functionDef(assembly, item);
+          break;
+        case "if-goto":
+          this.ifGoto(assembly, item, functionName);
+          break;
         case "label":
-          // Format: (Class.Function$Label)
           this.label(assembly, item, functionName);
           break;
         case "goto":
@@ -77,8 +178,102 @@ class VMTranslator {
     }
     return assembly;
   }
+  returnDef(assembly, item) {
+    // Return procedure:
+    // frame = LCL (save LCL to temp var)
+    // returnAddress = *(frame - 5)
+    // *ARG = pop()
+    // SP = ARG + 1
+    // THAT = *(frame - 1)
+    // THIS = *(frame - 2)
+    // ARG  = *(frame - 3)
+    // LCL  = *(frame - 4)
+    // goto returnAddress
+  }
+  functionDef(assembly, item) {
+    // Function process:
+    // insert (functionLabel) Format: Class.FunctionName
+    // repeat nVar times: push 0 (initialized LOCAL vars segment)
+    const functionLabel = `(${item.class}.${item.name})`;
+    assembly.push(`${functionLabel}`);
+    assembly.push(`@0`);
+    assembly.push(`D=A`);
+    for (let i = 0; i < item.nVars; i++) {
+      this.pushD(assembly);
+    }
+  }
+  callDef(assembly, item, returnNum) {
+    // Call procedure:
+    // push returnAddress Format: Class.FunctionName$ret.n (n == incrementing value for each function)
+    // push LCL
+    // push ARG
+    // push THIS
+    // push THAT
+    // ARG = SP - 5 - nArgs
+    // LCL = SP
+    // goto functionLabel
+    // insert (returnAddress) :: (returnAddress label generated above)
+    const returnLabel = `${item.class}.${item.name}$ret.${returnNum}`;
+
+    // push returnAddress
+    assembly.push(`@${returnLabel}`);
+    assembly.push(`D=M`);
+    this.pushD(assembly);
+
+    // push LCL
+    assembly.push(`@LCL`);
+    assembly.push(`D=M`);
+    this.pushD(assembly);
+
+    // push ARG
+    assembly.push(`@ARG`);
+    assembly.push(`D=M`);
+    this.pushD(assembly);
+
+    // push THIS
+    assembly.push(`@THIS`);
+    assembly.push(`D=M`);
+    this.pushD(assembly);
+
+    // push THAT
+    assembly.push(`@THAT`);
+    assembly.push(`D=M`);
+    this.pushD(assembly);
+
+    // ARG = SP - 5 - nArgs
+    assembly.push(`@SP`);
+    assembly.push(`D=A`);
+    assembly.push(`@5`);
+    assembly.push(`D=D-A`);
+    assembly.push(`@${item.nArgs}`);
+    assembly.push(`D=D-A`);
+    assembly.push(`@ARG`);
+    assembly.push(`M=D`);
+
+    // LCL = SP
+    assembly.push(`@SP`);
+    assembly.push(`D=A`);
+    assembly.push(`@LCL`);
+    assembly.push(`M=D`);
+
+    // goto functionLabel
+    assembly.push(`@${item.class}.${item.name}`);
+    assembly.push(`0;JMP`);
+
+    // insert (returnAddress) :: (returnAddress label generated above)
+    assembly.push(`(${returnLabel})`);
+  }
+  ifGoto(assembly, item, functionName) {
+    assembly.push(`@SP`);
+    assembly.push(`M=M-1`);
+    assembly.push(`A=M`);
+    assembly.push(`D=M`);
+    assembly.push(`@${item.class}.${functionName}$${item.label}`);
+    assembly.push(`D;JNE`);
+  }
   label(assembly, item, functionName) {
-    assembly.push(`(${item.class}.${functionName}$${item.label})`);
+    // Format: (Class.Function$Label)
+    assembly.push(`(${item.class}.${functionName}$${item.name})`);
   }
   goto(assembly, item, functionName) {
     assembly.push(`@${item.class}.${functionName}$${item.label}`);
@@ -297,82 +492,6 @@ class VMTranslator {
     return assembly;
   }
 
-  processCommands(input) {
-    const ast = [];
-    for (let item of input) {
-      let [command, ...rest] = item.split(" ");
-      switch (command) {
-        case "goto":
-        case "if-goto":
-          {
-            const [label] = rest;
-            const obj = { command, label, class: this.className };
-          }
-          break;
-        case "function":
-          {
-            const [name, nVars] = rest;
-            const obj = { command, name, nVars: +nVars, class: this.className };
-            ast.push(obj);
-          }
-          break;
-        case "call":
-          {
-            const [name, nArgs] = rest;
-            const obj = { command, name, nArgs: +nArgs, class: this.className };
-          }
-          break;
-        case "return":
-          {
-            const obj = { command, class: this.className };
-            ast.push(obj);
-          }
-          break;
-        case "label":
-          {
-            const [name] = rest;
-            const obj = { command, name, class: this.className };
-            ast.push(obj);
-          }
-          break;
-        case "push":
-        case "pop":
-          {
-            let [register, offset] = rest;
-            register = this.symbolMap[register.toUpperCase()];
-            const obj = {
-              command,
-              register,
-              offset: +offset,
-              source: item,
-              class: this.className,
-            };
-            ast.push(obj);
-          }
-          break;
-        case "add":
-        case "sub":
-        case "neg":
-        case "eq":
-        case "gt":
-        case "lt":
-        case "and":
-        case "or":
-        case "not":
-          {
-            const obj = { command, source: item, class: this.className };
-            ast.push(obj);
-          }
-          break;
-        default:
-          console.error(`Unknown command: ${item}`);
-          process.exit(1);
-          break;
-      }
-    }
-    return ast;
-  }
-
   getRawFile(fname) {
     try {
       if (fs.existsSync(fname)) {
@@ -395,6 +514,14 @@ class VMTranslator {
       if (clean.length > 0) output.push(clean);
     }
     return output;
+  }
+  // Push whatever is in the D register onto the stack
+  pushD(assembly) {
+    assembly.push(`@SP`);
+    assembly.push(`A=M`);
+    assembly.push(`M=D`);
+    assembly.push(`@SP`);
+    assembly.push(`M=M+1`);
   }
 }
 
@@ -422,27 +549,43 @@ class VMTranslator {
 // const inputFile = args.positionals[0];
 
 function processInput(input, files) {
+  outputFileName = "";
+  if (isDir(input)) {
+    outputFileName = input + "/" + path.basename(input) + ".asm";
+  } else {
+    outputFileName = input.replace(/\.vm$/, ".asm");
+  }
+  console.log("OUTPUTFILENAME:", outputFileName);
   for (let file of files) {
-    const vm = new VMTranslator(input + "/" + file);
+    // const vm = new VMTranslator(input + "/" + file);
+    const vm = isDir(input)
+      ? new VMTranslator(input + "/" + file)
+      : new VMTranslator(file);
 
     const assembledFile = path.parse(file);
     assembledFile.ext = "asm";
     assembledFile.base = "";
     // console.log("WRITING:", path.format(assembledFile), assembledFile);
     const newFile = file.replace(/\.vm$/, ".asm");
-    // fs.appendFileSync(newFile, )
-    console.log("ASSEMBLING FILE:", file, vm.assembly);
+    fs.appendFileSync(outputFileName, vm.assembly);
+    console.log(`ASSEMBLING FILE: ${file}\nASSEMBLY:\n${vm.assembly}`);
   }
 }
 
+function isDir(input) {
+  return fs.existsSync(input) && fs.lstatSync(input).isDirectory();
+}
+
 const inputFile = process.argv[2];
-let isDir = fs.existsSync(inputFile) && fs.lstatSync(inputFile).isDirectory();
+// let isDir = fs.existsSync(inputFile) && fs.lstatSync(inputFile).isDirectory();
 let files = [];
-if (isDir) {
+let outputFileName = "";
+if (isDir(inputFile)) {
   files = fs.readdirSync(inputFile).filter((e) => /\.vm$/.test(e));
 } else {
   files.push(inputFile);
 }
+
 console.log("input is:", files);
 
 if (files.length > 0) {
