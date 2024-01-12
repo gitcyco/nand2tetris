@@ -1,0 +1,13 @@
+// Tests that different functions, stored in two different 
+// class files, manipulate the static segment correctly. 
+function Sys.init 0
+	push constant 6
+	push constant 8
+	call ClassA.main 2
+	pop temp 0 // dumps the return value
+	push constant 6
+	push constant 8
+	call ClassA.main 2
+	pop temp 0 // dumps the return value
+label END
+	goto END

@@ -1,87 +1,215 @@
-// function Sys.init 0
-// push constant 4000
-@4000
+@256 // BOOTSTRAPING SP/LCL/ARG (0/1/2) = 256/300/400
+D=A
+@0
+M=D
+@300
+D=A
+@1
+M=D
+@400
+D=A
+@2
+M=D
+@Sys.init$ret.0
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-// pop pointer 0
+@LCL
+D=M
 @SP
+A=M
+M=D
+@SP
+M=M+1
+@ARG
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THIS
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THAT
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP
+D=M
+@5
+D=D-A
+@0
+D=D-A
+@ARG
+M=D
+@SP
+D=M
+@LCL
+M=D
+@Sys.init
+0;JMP
+(Sys.init$ret.0)
+(Sys.init) // function Sys.init 0
+@0
+D=A
+@4000 // push constant 4000
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP // pop pointer 0
 M=M-1
 A=M
 D=M
 @THIS
 M=D
-// push constant 5000
-@5000
+@5000 // push constant 5000
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-// pop pointer 1
-@SP
+@SP // pop pointer 1
 M=M-1
 A=M
 D=M
 @THAT
 M=D
-// pop temp 1
+@Sys.main$ret.0 // call Sys.main 0
+D=A
 @SP
+A=M
+M=D
+@SP
+M=M+1
+@LCL
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@ARG
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THIS
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THAT
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP
+D=M
+@5
+D=D-A
+@0
+D=D-A
+@ARG
+M=D
+@SP
+D=M
+@LCL
+M=D
+@Sys.main
+0;JMP
+(Sys.main$ret.0)
+@SP // pop temp 1
 M=M-1
 A=M
 D=M
 @6
 M=D
-// label LOOP
-(Sys.Sys.init$LOOP)
-// goto LOOP
-@Sys.Sys.init$LOOP
+(Sys.init$LOOP) // label LOOP
+@Sys.init$LOOP // goto LOOP
 0;JMP
-// function Sys.main 5
-// push constant 4001
-@4001
+(Sys.main) // function Sys.main 5
+@0
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-// pop pointer 0
 @SP
+A=M
+M=D
+@SP
+M=M+1
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@4001 // push constant 4001
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP // pop pointer 0
 M=M-1
 A=M
 D=M
 @THIS
 M=D
-// push constant 5001
-@5001
+@5001 // push constant 5001
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-// pop pointer 1
-@SP
+@SP // pop pointer 1
 M=M-1
 A=M
 D=M
 @THAT
 M=D
-// push constant 200
-@200
+@200 // push constant 200
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-// pop local 1
-@SP
+@SP // pop local 1
 M=M-1
 @LCL
 D=M
@@ -95,16 +223,14 @@ D=M
 @R13
 A=M
 M=D
-// push constant 40
-@40
+@40 // push constant 40
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-// pop local 2
-@SP
+@SP // pop local 2
 M=M-1
 @LCL
 D=M
@@ -118,16 +244,14 @@ D=M
 @R13
 A=M
 M=D
-// push constant 6
-@6
+@6 // push constant 6
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-// pop local 3
-@SP
+@SP // pop local 3
 M=M-1
 @LCL
 D=M
@@ -141,23 +265,70 @@ D=M
 @R13
 A=M
 M=D
-// push constant 123
-@123
+@123 // push constant 123
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-// pop temp 0
+@Sys.add12$ret.0 // call Sys.add12 1
+D=A
 @SP
+A=M
+M=D
+@SP
+M=M+1
+@LCL
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@ARG
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THIS
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THAT
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP
+D=M
+@5
+D=D-A
+@1
+D=D-A
+@ARG
+M=D
+@SP
+D=M
+@LCL
+M=D
+@Sys.add12
+0;JMP
+(Sys.add12$ret.0)
+@SP // pop temp 0
 M=M-1
 A=M
 D=M
 @5
 M=D
-// push local 0
-@LCL
+@LCL // push local 0
 D=M
 @0
 D=D+A
@@ -171,8 +342,7 @@ A=M
 M=D
 @SP
 M=M+1
-// push local 1
-@LCL
+@LCL // push local 1
 D=M
 @1
 D=D+A
@@ -186,8 +356,7 @@ A=M
 M=D
 @SP
 M=M+1
-// push local 2
-@LCL
+@LCL // push local 2
 D=M
 @2
 D=D+A
@@ -201,8 +370,7 @@ A=M
 M=D
 @SP
 M=M+1
-// push local 3
-@LCL
+@LCL // push local 3
 D=M
 @3
 D=D+A
@@ -216,8 +384,7 @@ A=M
 M=D
 @SP
 M=M+1
-// push local 4
-@LCL
+@LCL // push local 4
 D=M
 @4
 D=D+A
@@ -231,8 +398,7 @@ A=M
 M=D
 @SP
 M=M+1
-// add
-@SP
+@SP // add
 M=M-1
 A=M
 D=M
@@ -242,8 +408,7 @@ A=M
 M=D+M
 @SP
 M=M+1
-// add
-@SP
+@SP // add
 M=M-1
 A=M
 D=M
@@ -253,8 +418,7 @@ A=M
 M=D+M
 @SP
 M=M+1
-// add
-@SP
+@SP // add
 M=M-1
 A=M
 D=M
@@ -264,8 +428,7 @@ A=M
 M=D+M
 @SP
 M=M+1
-// add
-@SP
+@SP // add
 M=M-1
 A=M
 D=M
@@ -275,2013 +438,178 @@ A=M
 M=D+M
 @SP
 M=M+1
-// return
-// function Sys.add12 0
-// push constant 4002
-@4002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 0
-@SP
-M=M-1
-A=M
+@LCL // return
 D=M
-@THIS
-M=D
-// push constant 5002
-@5002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 1
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-// push argument 0
-@ARG
-D=M
-@0
-D=D+A
 @R13
 M=D
 @R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push constant 12
-@12
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-// return// function Sys.init 0
-// push constant 4000
-@4000
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 0
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-// push constant 5000
-@5000
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 1
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-// pop temp 1
-@SP
-M=M-1
-A=M
-D=M
-@6
-M=D
-// label LOOP
-(Sys.Sys.init$LOOP)
-// goto LOOP
-@Sys.Sys.init$LOOP
-0;JMP
-// function Sys.main 5
-// push constant 4001
-@4001
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 0
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-// push constant 5001
-@5001
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 1
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-// push constant 200
-@200
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop local 1
-@SP
-M=M-1
-@LCL
-D=M
-@1
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-// push constant 40
-@40
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop local 2
-@SP
-M=M-1
-@LCL
-D=M
-@2
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-// push constant 6
-@6
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop local 3
-@SP
-M=M-1
-@LCL
-D=M
-@3
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-// push constant 123
-@123
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop temp 0
-@SP
-M=M-1
-A=M
 D=M
 @5
-M=D
-// push local 0
-@LCL
+D=D-A
+A=D
 D=M
-@0
-D=D+A
-@R13
+@R14
 M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push local 1
-@LCL
-D=M
-@1
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push local 2
-@LCL
-D=M
-@2
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push local 3
-@LCL
-D=M
-@3
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push local 4
-@LCL
-D=M
-@4
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// add
 @SP
 M=M-1
 A=M
 D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-// return
-// function Sys.add12 0
-// push constant 4002
-@4002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 0
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-// push constant 5002
-@5002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 1
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-// push argument 0
 @ARG
-D=M
-@0
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
 A=M
 M=D
-@SP
-M=M+1
-// push constant 12
-@12
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-// return// function Sys.init 0
-
-// push constant 4000
-
-@4000
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 0
-
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-// push constant 5000
-
-@5000
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 1
-
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-// pop temp 1
-
-@SP
-M=M-1
-A=M
-D=M
-@6
-M=D
-// label LOOP
-
-(Sys.Sys.init$LOOP)
-// goto LOOP
-
-@Sys.Sys.init$LOOP
-0;JMP
-// function Sys.main 5
-
-// push constant 4001
-
-@4001
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 0
-
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-// push constant 5001
-
-@5001
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 1
-
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-// push constant 200
-
-@200
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop local 1
-
-@SP
-M=M-1
-@LCL
-D=M
-@1
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-// push constant 40
-
-@40
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop local 2
-
-@SP
-M=M-1
-@LCL
-D=M
-@2
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-// push constant 6
-
-@6
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop local 3
-
-@SP
-M=M-1
-@LCL
-D=M
-@3
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-// push constant 123
-
-@123
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop temp 0
-
-@SP
-M=M-1
-A=M
-D=M
-@5
-M=D
-// push local 0
-
-@LCL
-D=M
-@0
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push local 1
-
-@LCL
-D=M
-@1
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push local 2
-
-@LCL
-D=M
-@2
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push local 3
-
-@LCL
-D=M
-@3
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push local 4
-
-@LCL
-D=M
-@4
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// add
-
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-// add
-
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-// add
-
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-// add
-
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-// return
-
-// function Sys.add12 0
-
-// push constant 4002
-
-@4002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 0
-
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-// push constant 5002
-
-@5002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop pointer 1
-
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-// push argument 0
-
 @ARG
-D=M
-@0
-D=D+A
-@R13
+A=M
+D=A+1
+@SP
 M=D
 @R13
 A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push constant 12
-
-@12
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// add
-
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-// return
-
-// function Sys.init 0
-
-// push constant 4000
-@4000
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 0
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-
-// push constant 5000
-@5000
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 1
-@SP
-M=M-1
-A=M
+A=A-1
 D=M
 @THAT
 M=D
-
-// pop temp 1
-@SP
-M=M-1
+@R13
 A=M
+A=A-1
+A=A-1
 D=M
-@6
+@THIS
 M=D
-
-// label LOOP
-(Sys.Sys.init$LOOP)
-
-// goto LOOP
-@Sys.Sys.init$LOOP
+@R13
+A=M
+A=A-1
+A=A-1
+A=A-1
+D=M
+@ARG
+M=D
+@R13
+A=M
+A=A-1
+A=A-1
+A=A-1
+A=A-1
+D=M
+@LCL
+M=D
+@R14
+A=M
 0;JMP
 
-// function Sys.main 5
-
-// push constant 4001
-@4001
+(Sys.add12) // function Sys.add12 0
+@0
+D=A
+@4002 // push constant 4002
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-
-// pop pointer 0
-@SP
+@SP // pop pointer 0
 M=M-1
 A=M
 D=M
 @THIS
 M=D
-
-// push constant 5001
-@5001
+@5002 // push constant 5002
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-
-// pop pointer 1
-@SP
+@SP // pop pointer 1
 M=M-1
 A=M
 D=M
 @THAT
 M=D
-
-// push constant 200
-@200
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop local 1
-@SP
-M=M-1
-@LCL
+@ARG // push argument 0
 D=M
-@1
+@0
 D=D+A
 @R13
 M=D
-@SP
-A=M
-D=M
 @R13
 A=M
+D=M
+@SP
+A=M
 M=D
-
-// push constant 40
-@40
+@SP
+M=M+1
+@12 // push constant 12
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-
-// pop local 2
+@SP // add
+M=M-1
+A=M
+D=M
 @SP
 M=M-1
-@LCL
-D=M
-@2
-D=D+A
-@R13
-M=D
-@SP
 A=M
-D=M
-@R13
-A=M
-M=D
-
-// push constant 6
-@6
-D=A
-@SP
-A=M
-M=D
+M=D+M
 @SP
 M=M+1
-
-// pop local 3
-@SP
-M=M-1
-@LCL
-D=M
-@3
-D=D+A
-@R13
-M=D
-@SP
-A=M
+@LCL // return
 D=M
 @R13
-A=M
 M=D
-
-// push constant 123
-@123
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop temp 0
-@SP
-M=M-1
-A=M
+@R13
 D=M
 @5
-M=D
-
-// push local 0
-@LCL
+D=D-A
+A=D
 D=M
-@0
-D=D+A
-@R13
+@R14
 M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 1
-@LCL
-D=M
-@1
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 2
-@LCL
-D=M
-@2
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 3
-@LCL
-D=M
-@3
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 4
-@LCL
-D=M
-@4
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// add
 @SP
 M=M-1
 A=M
 D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// return
-
-// function Sys.add12 0
-
-// push constant 4002
-@4002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 0
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-
-// push constant 5002
-@5002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 1
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-
-// push argument 0
 @ARG
-D=M
-@0
-D=D+A
-@R13
+A=M
+M=D
+@ARG
+A=M
+D=A+1
+@SP
 M=D
 @R13
 A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push constant 12
-@12
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// return
-// function Sys.init 0
-(Sys.Sys.init)
-@0
-D=A
-
-// push constant 4000
-@4000
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 0
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-
-// push constant 5000
-@5000
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 1
-@SP
-M=M-1
-A=M
+A=A-1
 D=M
 @THAT
 M=D
-
-// pop temp 1
-@SP
-M=M-1
+@R13
 A=M
+A=A-1
+A=A-1
 D=M
-@6
+@THIS
 M=D
-
-// label LOOP
-(Sys.Sys.init$LOOP)
-
-// goto LOOP
-@Sys.Sys.init$LOOP
+@R13
+A=M
+A=A-1
+A=A-1
+A=A-1
+D=M
+@ARG
+M=D
+@R13
+A=M
+A=A-1
+A=A-1
+A=A-1
+A=A-1
+D=M
+@LCL
+M=D
+@R14
+A=M
 0;JMP
-
-// function Sys.main 5
-(Sys.Sys.main)
-@0
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-@SP
-A=M
-M=D
-@SP
-M=M+1
-@SP
-A=M
-M=D
-@SP
-M=M+1
-@SP
-A=M
-M=D
-@SP
-M=M+1
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push constant 4001
-@4001
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 0
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-
-// push constant 5001
-@5001
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 1
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-
-// push constant 200
-@200
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop local 1
-@SP
-M=M-1
-@LCL
-D=M
-@1
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-
-// push constant 40
-@40
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop local 2
-@SP
-M=M-1
-@LCL
-D=M
-@2
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-
-// push constant 6
-@6
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop local 3
-@SP
-M=M-1
-@LCL
-D=M
-@3
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-
-// push constant 123
-@123
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop temp 0
-@SP
-M=M-1
-A=M
-D=M
-@5
-M=D
-
-// push local 0
-@LCL
-D=M
-@0
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 1
-@LCL
-D=M
-@1
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 2
-@LCL
-D=M
-@2
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 3
-@LCL
-D=M
-@3
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 4
-@LCL
-D=M
-@4
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// return
-
-// function Sys.add12 0
-(Sys.Sys.add12)
-@0
-D=A
-
-// push constant 4002
-@4002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 0
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-
-// push constant 5002
-@5002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 1
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-
-// push argument 0
-@ARG
-D=M
-@0
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push constant 12
-@12
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// return
-// function Sys.init 0
-(Sys.Sys.init)
-@0
-D=A
-
-// push constant 4000
-@4000
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 0
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-
-// push constant 5000
-@5000
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 1
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-
-// pop temp 1
-@SP
-M=M-1
-A=M
-D=M
-@6
-M=D
-
-// label LOOP
-(Sys.Sys.init$LOOP)
-
-// goto LOOP
-@Sys.Sys.init$LOOP
-0;JMP
-
-// function Sys.main 5
-(Sys.Sys.main)
-@0
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-@SP
-A=M
-M=D
-@SP
-M=M+1
-@SP
-A=M
-M=D
-@SP
-M=M+1
-@SP
-A=M
-M=D
-@SP
-M=M+1
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push constant 4001
-@4001
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 0
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-
-// push constant 5001
-@5001
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 1
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-
-// push constant 200
-@200
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop local 1
-@SP
-M=M-1
-@LCL
-D=M
-@1
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-
-// push constant 40
-@40
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop local 2
-@SP
-M=M-1
-@LCL
-D=M
-@2
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-
-// push constant 6
-@6
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop local 3
-@SP
-M=M-1
-@LCL
-D=M
-@3
-D=D+A
-@R13
-M=D
-@SP
-A=M
-D=M
-@R13
-A=M
-M=D
-
-// push constant 123
-@123
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop temp 0
-@SP
-M=M-1
-A=M
-D=M
-@5
-M=D
-
-// push local 0
-@LCL
-D=M
-@0
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 1
-@LCL
-D=M
-@1
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 2
-@LCL
-D=M
-@2
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 3
-@LCL
-D=M
-@3
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push local 4
-@LCL
-D=M
-@4
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// return
-
-// function Sys.add12 0
-(Sys.Sys.add12)
-@0
-D=A
-
-// push constant 4002
-@4002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 0
-@SP
-M=M-1
-A=M
-D=M
-@THIS
-M=D
-
-// push constant 5002
-@5002
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// pop pointer 1
-@SP
-M=M-1
-A=M
-D=M
-@THAT
-M=D
-
-// push argument 0
-@ARG
-D=M
-@0
-D=D+A
-@R13
-M=D
-@R13
-A=M
-D=M
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// push constant 12
-@12
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
-// add
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M-1
-A=M
-M=D+M
-@SP
-M=M+1
-
-// return

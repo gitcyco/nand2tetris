@@ -1,5 +1,4 @@
-// BOOTSTRAPING SP/LCL/ARG (0/1/2) = 256/300/400
-@256
+@256 // BOOTSTRAPING SP/LCL/ARG (0/1/2) = 256/300/400
 D=A
 @0
 M=D
@@ -11,15 +10,60 @@ M=D
 D=A
 @2
 M=D
+@Sys.init$ret.0
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@LCL
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@ARG
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THIS
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@THAT
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+@SP
+D=M
+@5
+D=D-A
+@0
+D=D-A
+@ARG
+M=D
+@SP
+D=M
+@LCL
+M=D
 @Sys.init
 0;JMP
-// function Main.fibonacci 0
-(Main.fibonacci)
+(Sys.init$ret.0)
+(Main.fibonacci) // function Main.fibonacci 0
 @0
 D=A
-
-// push argument 0
-@ARG
+@ARG // push argument 0
 D=M
 @0
 D=D+A
@@ -33,18 +77,14 @@ A=M
 M=D
 @SP
 M=M+1
-
-// push constant 2
-@2
+@2 // push constant 2
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-
-// lt
-@SP
+@SP // lt
 M=M-1
 A=M
 D=M
@@ -75,24 +115,16 @@ M=D-1
 (Main_END1_lt)
 @SP
 M=M+1
-
-// if-goto N_LT_2
-@SP
+@SP // if-goto N_LT_2
 M=M-1
 A=M
 D=M
 @Main.fibonacci$N_LT_2
 D;JNE
-
-// goto N_GE_2
-@Main.fibonacci$N_GE_2
+@Main.fibonacci$N_GE_2 // goto N_GE_2
 0;JMP
-
-// label N_LT_2
-(Main.fibonacci$N_LT_2)
-
-// push argument 0
-@ARG
+(Main.fibonacci$N_LT_2) // label N_LT_2
+@ARG // push argument 0
 D=M
 @0
 D=D+A
@@ -106,47 +138,66 @@ A=M
 M=D
 @SP
 M=M+1
-
-// return
-@LCL
+@LCL // return
 D=M
 @R13
 M=D
-@SP
-M=M-1
-A=M
-D=M
-@ARG
-A=M
-M=D
-@ARG
-A=M
-D=M+1
-@SP
-M=D
 @R13
 D=M
-D=D-1
-@THAT
-M=D
-D=D-1
-@THIS
-M=D
-D=D-1
-@ARG
-M=D
-D=D-1
-@LCL
-M=D
-D=D-1
+@5
+D=D-A
 A=D
+D=M
+@R14
+M=D
+@SP
+M=M-1
+A=M
+D=M
+@ARG
+A=M
+M=D
+@ARG
+A=M
+D=A+1
+@SP
+M=D
+@R13
+A=M
+A=A-1
+D=M
+@THAT
+M=D
+@R13
+A=M
+A=A-1
+A=A-1
+D=M
+@THIS
+M=D
+@R13
+A=M
+A=A-1
+A=A-1
+A=A-1
+D=M
+@ARG
+M=D
+@R13
+A=M
+A=A-1
+A=A-1
+A=A-1
+A=A-1
+D=M
+@LCL
+M=D
+@R14
+A=M
 0;JMP
 
-// label N_GE_2
-(Main.fibonacci$N_GE_2)
-
-// push argument 0
-@ARG
+(Main.fibonacci$N_GE_2) // label N_GE_2
+@ARG // push argument 0
 D=M
 @0
 D=D+A
@@ -160,18 +211,14 @@ A=M
 M=D
 @SP
 M=M+1
-
-// push constant 2
-@2
+@2 // push constant 2
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-
-// sub
-@SP
+@SP // sub
 M=M-1
 A=M
 D=M
@@ -181,9 +228,7 @@ A=M
 M=M-D
 @SP
 M=M+1
-
-// call Main.fibonacci 1
-@Main.fibonacci$ret.0
+@Main.Main.fibonacci$ret.0 // call Main.fibonacci 1
 D=A
 @SP
 A=M
@@ -219,7 +264,7 @@ M=D
 @SP
 M=M+1
 @SP
-D=A
+D=M
 @5
 D=D-A
 @1
@@ -227,15 +272,13 @@ D=D-A
 @ARG
 M=D
 @SP
-D=A
+D=M
 @LCL
 M=D
 @Main.fibonacci
 0;JMP
-(Main.fibonacci$ret.0)
-
-// push argument 0
-@ARG
+(Main.Main.fibonacci$ret.0)
+@ARG // push argument 0
 D=M
 @0
 D=D+A
@@ -249,18 +292,14 @@ A=M
 M=D
 @SP
 M=M+1
-
-// push constant 1
-@1
+@1 // push constant 1
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-
-// sub
-@SP
+@SP // sub
 M=M-1
 A=M
 D=M
@@ -270,9 +309,7 @@ A=M
 M=M-D
 @SP
 M=M+1
-
-// call Main.fibonacci 1
-@Main.fibonacci$ret.1
+@Main.Main.fibonacci$ret.1 // call Main.fibonacci 1
 D=A
 @SP
 A=M
@@ -308,7 +345,7 @@ M=D
 @SP
 M=M+1
 @SP
-D=A
+D=M
 @5
 D=D-A
 @1
@@ -316,15 +353,13 @@ D=D-A
 @ARG
 M=D
 @SP
-D=A
+D=M
 @LCL
 M=D
 @Main.fibonacci
 0;JMP
-(Main.fibonacci$ret.1)
-
-// add
-@SP
+(Main.Main.fibonacci$ret.1)
+@SP // add
 M=M-1
 A=M
 D=M
@@ -334,11 +369,17 @@ A=M
 M=D+M
 @SP
 M=M+1
-
-// return
-@LCL
+@LCL // return
 D=M
 @R13
+M=D
+@R13
+D=M
+@5
+D=D-A
+A=D
+D=M
+@R14
 M=D
 @SP
 M=M-1
@@ -349,42 +390,53 @@ A=M
 M=D
 @ARG
 A=M
-D=M+1
+D=A+1
 @SP
 M=D
 @R13
+A=M
+A=A-1
 D=M
-D=D-1
 @THAT
 M=D
-D=D-1
+@R13
+A=M
+A=A-1
+A=A-1
+D=M
 @THIS
 M=D
-D=D-1
+@R13
+A=M
+A=A-1
+A=A-1
+A=A-1
+D=M
 @ARG
 M=D
-D=D-1
+@R13
+A=M
+A=A-1
+A=A-1
+A=A-1
+A=A-1
+D=M
 @LCL
 M=D
-D=D-1
-A=D
+@R14
+A=M
 0;JMP
-// function Sys.init 0
-(Sys.init)
+(Sys.init) // function Sys.init 0
 @0
 D=A
-
-// push constant 4
-@4
+@4 // push constant 4
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-
-// call Main.fibonacci 1
-@Main.fibonacci$ret.0
+@Sys.Main.fibonacci$ret.0 // call Main.fibonacci 1
 D=A
 @SP
 A=M
@@ -420,7 +472,7 @@ M=D
 @SP
 M=M+1
 @SP
-D=A
+D=M
 @5
 D=D-A
 @1
@@ -428,16 +480,12 @@ D=D-A
 @ARG
 M=D
 @SP
-D=A
+D=M
 @LCL
 M=D
 @Main.fibonacci
 0;JMP
-(Main.fibonacci$ret.0)
-
-// label END
-(Sys.init$END)
-
-// goto END
-@Sys.init$END
+(Sys.Main.fibonacci$ret.0)
+(Sys.init$END) // label END
+@Sys.init$END // goto END
 0;JMP

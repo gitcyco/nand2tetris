@@ -10,6 +10,7 @@ class VMTranslator {
     this.gtJMPNum = 0;
     this.ltJMPNum = 0;
     this.staticNum = 0;
+    this.returnNum = 0;
     this.symbolMap = {
       LOCAL: "LCL",
       ARGUMENT: "ARG",
@@ -30,7 +31,7 @@ class VMTranslator {
     assembledFile.ext = "asm";
     assembledFile.base = "";
     // console.log("WRITING:", path.format(assembledFile), assembledFile);
-    const newFile = file.replace(/\.vm$/, ".asm");
+    // const newFile = file.replace(/\.vm$/, ".asm");
     // fs.writeFileSync(newFile, this.assembly);
     // fs.writeFileSync(path.format(assembledFile), this.assembly);
   }
@@ -116,7 +117,6 @@ class VMTranslator {
           }
           break;
         default:
-          console.error(`Unknown command: ${item}`);
           process.exit(1);
           break;
       }
@@ -128,7 +128,7 @@ class VMTranslator {
     let functionName = "";
     let returnNum = 0;
     for (let item of ast) {
-      assembly.push(`\n// ${item.source}`);
+      // assembly.push(`\n// ${item.source}`);
 
       switch (item.command) {
         case "return":
@@ -153,27 +153,27 @@ class VMTranslator {
           this.goto(assembly, item, functionName);
           break;
         case "pop":
-          this.pop(item.register, item.offset, assembly, functionName);
+          this.pop(item.register, item.offset, assembly, item);
           break;
         case "push":
-          this.push(item.register, item.offset, assembly, functionName);
+          this.push(item.register, item.offset, assembly, item);
           break;
         case "add":
         case "sub":
-          this.addSub(assembly, item.command, functionName);
+          this.addSub(assembly, item.command, item);
           break;
         case "and":
         case "or":
-          this.andOr(assembly, item.command, functionName);
+          this.andOr(assembly, item.command, item);
           break;
         case "not":
         case "neg":
-          this.notNeg(assembly, item.command, functionName);
+          this.notNeg(assembly, item.command, item);
           break;
         case "eq":
         case "lt":
         case "gt":
-          this.eqLtGt(assembly, item.command, functionName);
+          this.eqLtGt(assembly, item.command, item);
           break;
         default:
           break;
@@ -194,10 +194,31 @@ class VMTranslator {
     // goto returnAddress
 
     // frame = LCL (save LCL to temp var)
-    assembly.push(`@LCL`);
+    assembly.push(`@LCL // ${item.source}`);
     assembly.push(`D=M`);
     assembly.push(`@R13`);
     assembly.push(`M=D`);
+
+    // Save return address to R14
+    assembly.push(`@R13`);
+    assembly.push(`D=M`);
+    assembly.push(`@5`);
+    assembly.push(`D=D-A`);
+    assembly.push(`A=D`);
+    assembly.push(`D=M`);
+    // assembly.push(``);
+    assembly.push(`@R14`);
+    assembly.push(`M=D`);
+
+    // assembly.push(`A=M`);
+    // assembly.push(`A=A-1`);
+    // assembly.push(`A=A-1`);
+    // assembly.push(`A=A-1`);
+    // assembly.push(`A=A-1`);
+    // assembly.push(`A=A-1`);
+    // assembly.push(`D=A`);
+    // assembly.push(`@R14`);
+    // assembly.push(`M=D`);
 
     // *ARG = pop()
     assembly.push(`@SP`);
@@ -211,36 +232,79 @@ class VMTranslator {
     // SP = ARG + 1
     assembly.push(`@ARG`);
     assembly.push(`A=M`);
-    assembly.push(`D=M+1`);
+    assembly.push(`D=A+1`);
     assembly.push(`@SP`);
     assembly.push(`M=D`);
 
     // THAT = *(frame - 1)
     assembly.push(`@R13`);
+    assembly.push(`A=M`);
+    assembly.push(`A=A-1`);
     assembly.push(`D=M`);
-    assembly.push(`D=D-1`);
     assembly.push(`@THAT`);
     assembly.push(`M=D`);
 
     // THIS = *(frame - 2)
-    assembly.push(`D=D-1`);
+    // assembly.push(`D=D-1`);
+    // assembly.push(`@THIS`);
+    // assembly.push(`M=D`);
+    assembly.push(`@R13`);
+    assembly.push(`A=M`);
+    assembly.push(`A=A-1`);
+    assembly.push(`A=A-1`);
+    assembly.push(`D=M`);
     assembly.push(`@THIS`);
     assembly.push(`M=D`);
 
     // ARG  = *(frame - 3)
-    assembly.push(`D=D-1`);
+    // assembly.push(`D=D-1`);
+    // assembly.push(`@ARG`);
+    // assembly.push(`M=D`);
+    assembly.push(`@R13`);
+    assembly.push(`A=M`);
+    assembly.push(`A=A-1`);
+    assembly.push(`A=A-1`);
+    assembly.push(`A=A-1`);
+    assembly.push(`D=M`);
     assembly.push(`@ARG`);
     assembly.push(`M=D`);
 
     // LCL  = *(frame - 4)
-    assembly.push(`D=D-1`);
+    // assembly.push(`D=D-1`);
+    // assembly.push(`@LCL`);
+    // assembly.push(`M=D`);
+    assembly.push(`@R13`);
+    assembly.push(`A=M`);
+    assembly.push(`A=A-1`);
+    assembly.push(`A=A-1`);
+    assembly.push(`A=A-1`);
+    assembly.push(`A=A-1`);
+    assembly.push(`D=M`);
     assembly.push(`@LCL`);
     assembly.push(`M=D`);
 
-    // returnAddress = *(frame - 5)
-    assembly.push(`D=D-1`);
-    assembly.push(`A=D`);
-    assembly.push(`0;JMP`);
+    // returnAddress = *(frame - 5) (stored in R14)
+    assembly.push(`@R14`);
+    assembly.push(`A=M`);
+    assembly.push(`0;JMP\n`);
+
+    // assembly.push(`D=D-1`);
+    // assembly.push(`A=D`);
+    // assembly.push(`0;JMP`);
+
+    // assembly.push(`@R13`);
+    // assembly.push(`A=M`);
+    // assembly.push(`A=A-1`);
+    // assembly.push(`A=A-1`);
+    // assembly.push(`A=A-1`);
+    // assembly.push(`A=A-1`);
+    // assembly.push(`A=A-1`);
+    // assembly.push(`A=M`);
+    // assembly.push(`0;JMP`);
+
+    // assembly.push(`D=M`);
+    // assembly.push(`@THAT`);
+    // assembly.push(`M=D`);
     // assembly.push(``);
     // assembly.push(``);
     // assembly.push(``);
@@ -251,7 +315,7 @@ class VMTranslator {
     // repeat nVar times: push 0 (initialized LOCAL vars segment)
     // const functionLabel = `(${item.class}.${item.name})`;
     const functionLabel = `(${item.name})`;
-    assembly.push(`${functionLabel}`);
+    assembly.push(`${functionLabel} // ${item.source}`);
     assembly.push(`@0`);
     assembly.push(`D=A`);
     for (let i = 0; i < item.nVars; i++) {
@@ -270,10 +334,10 @@ class VMTranslator {
     // goto functionLabel
     // insert (returnAddress) :: (returnAddress label generated above)
     // const returnLabel = `${item.class}.${item.name}$ret.${returnNum}`;
-    const returnLabel = `${item.name}$ret.${returnNum}`;
+    const returnLabel = `${item.class}.${item.name}$ret.${returnNum}`;
 
     // push returnAddress
-    assembly.push(`@${returnLabel}`);
+    assembly.push(`@${returnLabel} // ${item.source}`);
     assembly.push(`D=A`);
     this.pushD(assembly);
 
@@ -299,7 +363,7 @@ class VMTranslator {
 
     // ARG = SP - 5 - nArgs
     assembly.push(`@SP`);
-    assembly.push(`D=A`);
+    assembly.push(`D=M`);
     assembly.push(`@5`);
     assembly.push(`D=D-A`);
     assembly.push(`@${item.nArgs}`);
@@ -309,7 +373,7 @@ class VMTranslator {
 
     // LCL = SP
     assembly.push(`@SP`);
-    assembly.push(`D=A`);
+    assembly.push(`D=M`);
     assembly.push(`@LCL`);
     assembly.push(`M=D`);
 
@@ -322,7 +386,7 @@ class VMTranslator {
     assembly.push(`(${returnLabel})`);
   }
   ifGoto(assembly, item, functionName) {
-    assembly.push(`@SP`);
+    assembly.push(`@SP // ${item.source}`);
     assembly.push(`M=M-1`);
     assembly.push(`A=M`);
     assembly.push(`D=M`);
@@ -331,14 +395,14 @@ class VMTranslator {
   }
   label(assembly, item, functionName) {
     // Format: (Class.Function$Label)
-    assembly.push(`(${functionName}$${item.name})`);
+    assembly.push(`(${functionName}$${item.name}) // ${item.source}`);
   }
   goto(assembly, item, functionName) {
-    assembly.push(`@${functionName}$${item.label}`);
+    assembly.push(`@${functionName}$${item.label} // ${item.source}`);
     assembly.push(`0;JMP`);
   }
-  addSub(assembly, op, functionName) {
-    assembly.push(`@SP`);
+  addSub(assembly, op, item) {
+    assembly.push(`@SP // ${item.source}`);
     assembly.push(`M=M-1`);
     assembly.push(`A=M`);
     assembly.push(`D=M`);
@@ -350,8 +414,8 @@ class VMTranslator {
     assembly.push(`@SP`);
     assembly.push(`M=M+1`);
   }
-  andOr(assembly, op, functionName) {
-    assembly.push(`@SP`);
+  andOr(assembly, op, item) {
+    assembly.push(`@SP // ${item.source}`);
     assembly.push(`M=M-1`);
     assembly.push(`A=M`);
     assembly.push(`D=M`);
@@ -363,8 +427,8 @@ class VMTranslator {
     assembly.push(`@SP`);
     assembly.push(`M=M+1`);
   }
-  notNeg(assembly, op, functionName) {
-    assembly.push(`@SP`);
+  notNeg(assembly, op, item) {
+    assembly.push(`@SP // ${item.source}`);
     assembly.push(`M=M-1`);
     assembly.push(`A=M`);
     if (op === "not") assembly.push(`M=!M`);
@@ -372,7 +436,7 @@ class VMTranslator {
     assembly.push(`@SP`);
     assembly.push(`M=M+1`);
   }
-  eqLtGt(assembly, op, functionName) {
+  eqLtGt(assembly, op, item) {
     // Move y into R13
     // Move x into D
     // Move R13 into A
@@ -390,7 +454,7 @@ class VMTranslator {
     else operator = `D;JGT`;
     const eqJumpLabel = `${this.className}_JMP${this.eqJMPNum++}_${op}`;
     const endLabel = `${this.className}_END${this.eqJMPNum++}_${op}`;
-    assembly.push(`@SP`);
+    assembly.push(`@SP // ${item.source}`);
     assembly.push(`M=M-1`);
     assembly.push(`A=M`);
     assembly.push(`D=M`);
@@ -429,13 +493,13 @@ class VMTranslator {
     assembly.push(`M=M+1`);
   }
 
-  push(register, offset, assembly, functionName) {
+  push(register, offset, assembly, item) {
     switch (register) {
       case "POINTER":
         if (register === "POINTER") {
           register = offset === 0 ? "THIS" : "THAT";
         }
-        assembly.push(`@${register}`);
+        assembly.push(`@${register} // ${item.source}`);
         assembly.push(`D=M`);
         assembly.push(`@SP`);
         assembly.push(`A=M`);
@@ -447,7 +511,7 @@ class VMTranslator {
       case "ARG":
       case "THIS":
       case "THAT":
-        assembly.push(`@${register}`);
+        assembly.push(`@${register} // ${item.source}`);
         assembly.push(`D=M`);
         assembly.push(`@${offset}`);
         assembly.push(`D=D+A`);
@@ -464,7 +528,7 @@ class VMTranslator {
         assembly.push(`M=M+1`);
         break;
       case "STATIC":
-        assembly.push(`@${this.className}.${offset}`);
+        assembly.push(`@${this.className}.${offset} // ${item.source}`);
         assembly.push(`D=M`);
         assembly.push(`@SP`);
         assembly.push(`A=M`);
@@ -473,7 +537,7 @@ class VMTranslator {
         assembly.push(`M=M+1`);
         break;
       case "TEMP":
-        assembly.push(`@${parseInt(5 + offset)}`);
+        assembly.push(`@${parseInt(5 + offset)} // ${item.source}`);
         assembly.push(`D=M`);
         assembly.push(`@SP`);
         assembly.push(`A=M`);
@@ -482,7 +546,7 @@ class VMTranslator {
         assembly.push(`M=M+1`);
         break;
       case "CONSTANT":
-        assembly.push(`@${offset}`);
+        assembly.push(`@${offset} // ${item.source}`);
         assembly.push(`D=A`);
         assembly.push(`@SP`);
         assembly.push(`A=M`);
@@ -495,11 +559,11 @@ class VMTranslator {
     }
   }
 
-  pop(register, offset, assembly, functionName) {
+  pop(register, offset, assembly, item) {
     switch (register) {
       case "POINTER":
         register = offset === 0 ? "THIS" : "THAT";
-        assembly.push(`@SP`);
+        assembly.push(`@SP // ${item.source}`);
         assembly.push(`M=M-1`);
         assembly.push(`A=M`);
         assembly.push(`D=M`);
@@ -510,7 +574,7 @@ class VMTranslator {
       case "ARG":
       case "THIS":
       case "THAT":
-        assembly.push(`@SP`);
+        assembly.push(`@SP // ${item.source}`);
         assembly.push(`M=M-1`);
         assembly.push(`@${register}`);
         assembly.push(`D=M`);
@@ -526,7 +590,7 @@ class VMTranslator {
         assembly.push(`M=D`);
         break;
       case "STATIC":
-        assembly.push(`@SP`);
+        assembly.push(`@SP // ${item.source}`);
         assembly.push(`M=M-1`);
         assembly.push(`A=M`);
         assembly.push(`D=M`);
@@ -534,7 +598,7 @@ class VMTranslator {
         assembly.push(`M=D`);
         break;
       case "TEMP":
-        assembly.push(`@SP`);
+        assembly.push(`@SP // ${item.source}`);
         assembly.push(`M=M-1`);
         assembly.push(`A=M`);
         assembly.push(`D=M`);
@@ -614,13 +678,14 @@ function processInput(input, files) {
     outputFileName = input.replace(/\.vm$/, ".asm");
   }
   console.log("OUTPUTFILENAME:", outputFileName);
-  fs.renameSync(outputFileName, outputFileName + ".bak");
+  // fs.renameSync(outputFileName, outputFileName + ".bak");
+  fs.writeFileSync(outputFileName, "");
 
   if (BOOTSTRAP) {
     const bootstrap = [];
-    bootstrap.push(`// BOOTSTRAPING SP/LCL/ARG (0/1/2) = 256/300/400`);
+    // bootstrap.push(`// BOOTSTRAPING SP/LCL/ARG (0/1/2) = 256/300/400`);
     // SP = 256
-    bootstrap.push(`@256`);
+    bootstrap.push(`@256 // BOOTSTRAPING SP/LCL/ARG (0/1/2) = 256/300/400`);
     bootstrap.push(`D=A`);
     bootstrap.push(`@0`);
     bootstrap.push(`M=D`);
@@ -638,8 +703,91 @@ function processInput(input, files) {
     bootstrap.push(`M=D`);
 
     // call Sys.init
+    // bootstrap.push(`@Sys.init`);
+    // bootstrap.push(`0;JMP\n`);
+
+    // All of the below is not needed, commenting out for now:
+    const returnLabel = `Sys.init$ret.0`;
+
+    // bootstrap.push(`@0`);
+    // bootstrap.push(`D=A`);
+    // bootstrap.push(`@SP`);
+    // bootstrap.push(`A=M`);
+    // bootstrap.push(`M=D`);
+    // bootstrap.push(`@SP`);
+    // bootstrap.push(`M=M+1`);
+
+    // push returnAddress
+    bootstrap.push(`@${returnLabel}`);
+    bootstrap.push(`D=A`);
+    bootstrap.push(`@SP`);
+    bootstrap.push(`A=M`);
+    bootstrap.push(`M=D`);
+    bootstrap.push(`@SP`);
+    bootstrap.push(`M=M+1`);
+
+    // push LCL
+    bootstrap.push(`@LCL`);
+    bootstrap.push(`D=M`);
+    bootstrap.push(`@SP`);
+    bootstrap.push(`A=M`);
+    bootstrap.push(`M=D`);
+    bootstrap.push(`@SP`);
+    bootstrap.push(`M=M+1`);
+
+    // push ARG
+    bootstrap.push(`@ARG`);
+    bootstrap.push(`D=M`);
+    bootstrap.push(`@SP`);
+    bootstrap.push(`A=M`);
+    bootstrap.push(`M=D`);
+    bootstrap.push(`@SP`);
+    bootstrap.push(`M=M+1`);
+
+    // push THIS
+    bootstrap.push(`@THIS`);
+    bootstrap.push(`D=M`);
+    bootstrap.push(`@SP`);
+    bootstrap.push(`A=M`);
+    bootstrap.push(`M=D`);
+    bootstrap.push(`@SP`);
+    bootstrap.push(`M=M+1`);
+
+    // push THAT
+    bootstrap.push(`@THAT`);
+    bootstrap.push(`D=M`);
+    bootstrap.push(`@SP`);
+    bootstrap.push(`A=M`);
+    bootstrap.push(`M=D`);
+    bootstrap.push(`@SP`);
+    bootstrap.push(`M=M+1`);
+
+    // ARG = SP - 5 - nArgs
+    bootstrap.push(`@SP`);
+    bootstrap.push(`D=M`);
+    bootstrap.push(`@5`);
+    bootstrap.push(`D=D-A`);
+    // bootstrap.push(`@${item.nArgs}`);
+    bootstrap.push(`@0`);
+    bootstrap.push(`D=D-A`);
+    bootstrap.push(`@ARG`);
+    bootstrap.push(`M=D`);
+
+    // LCL = SP
+    bootstrap.push(`@SP`);
+    bootstrap.push(`D=M`);
+    bootstrap.push(`@LCL`);
+    bootstrap.push(`M=D`);
+
+    // goto functionLabel
+    // assembly.push(`@${item.class}.${item.name}`);
+    // bootstrap.push(`@${item.name}`);
     bootstrap.push(`@Sys.init`);
     bootstrap.push(`0;JMP`);
+
+    // insert (returnAddress) :: (returnAddress label generated above)
+    bootstrap.push(`(${returnLabel})\n`);
+
     fs.appendFileSync(outputFileName, bootstrap.join("\n"));
   }
 

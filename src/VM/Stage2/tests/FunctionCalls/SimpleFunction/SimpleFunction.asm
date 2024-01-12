@@ -1,6 +1,4 @@
-
-// function SimpleFunction.test 2
-(SimpleFunction.test)
+(SimpleFunction.test) // function SimpleFunction.test 2
 @0
 D=A
 @SP
@@ -13,9 +11,7 @@ A=M
 M=D
 @SP
 M=M+1
-
-// push local 0
-@LCL
+@LCL // push local 0
 D=M
 @0
 D=D+A
@@ -29,9 +25,7 @@ A=M
 M=D
 @SP
 M=M+1
-
-// push local 1
-@LCL
+@LCL // push local 1
 D=M
 @1
 D=D+A
@@ -45,9 +39,7 @@ A=M
 M=D
 @SP
 M=M+1
-
-// add
-@SP
+@SP // add
 M=M-1
 A=M
 D=M
@@ -57,17 +49,13 @@ A=M
 M=D+M
 @SP
 M=M+1
-
-// not
-@SP
+@SP // not
 M=M-1
 A=M
 M=!M
 @SP
 M=M+1
-
-// push argument 0
-@ARG
+@ARG // push argument 0
 D=M
 @0
 D=D+A
@@ -81,9 +69,7 @@ A=M
 M=D
 @SP
 M=M+1
-
-// add
-@SP
+@SP // add
 M=M-1
 A=M
 D=M
@@ -93,9 +79,7 @@ A=M
 M=D+M
 @SP
 M=M+1
-
-// push argument 1
-@ARG
+@ARG // push argument 1
 D=M
 @1
 D=D+A
@@ -109,9 +93,7 @@ A=M
 M=D
 @SP
 M=M+1
-
-// sub
-@SP
+@SP // sub
 M=M-1
 A=M
 D=M
@@ -121,11 +103,17 @@ A=M
 M=M-D
 @SP
 M=M+1
-
-// return
-@LCL
+@LCL // return
 D=M
 @R13
+M=D
+@R13
+D=M
+@5
+D=D-A
+A=D
+D=M
+@R14
 M=D
 @SP
 M=M-1
@@ -136,23 +124,39 @@ A=M
 M=D
 @ARG
 A=M
-D=M+1
+D=A+1
 @SP
 M=D
 @R13
+A=M
+A=A-1
 D=M
-D=D-1
 @THAT
 M=D
-D=D-1
+@R13
+A=M
+A=A-1
+A=A-1
+D=M
 @THIS
 M=D
-D=D-1
+@R13
+A=M
+A=A-1
+A=A-1
+A=A-1
+D=M
 @ARG
 M=D
-D=D-1
+@R13
+A=M
+A=A-1
+A=A-1
+A=A-1
+A=A-1
+D=M
 @LCL
 M=D
-D=D-1
-A=D
+@R14
+A=M
 0;JMP
