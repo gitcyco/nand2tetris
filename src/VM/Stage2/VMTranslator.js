@@ -200,25 +200,7 @@ class VMTranslator {
     assembly.push(`M=D`);
 
     // Save return address to R14
-    assembly.push(`@R13`);
-    assembly.push(`D=M`);
-    assembly.push(`@5`);
-    assembly.push(`D=D-A`);
-    assembly.push(`A=D`);
-    assembly.push(`D=M`);
-    // assembly.push(``);
-    assembly.push(`@R14`);
-    assembly.push(`M=D`);
-
-    // assembly.push(`A=M`);
-    // assembly.push(`A=A-1`);
-    // assembly.push(`A=A-1`);
-    // assembly.push(`A=A-1`);
-    // assembly.push(`A=A-1`);
-    // assembly.push(`A=A-1`);
-    // assembly.push(`D=A`);
-    // assembly.push(`@R14`);
-    // assembly.push(`M=D`);
+    this.returnDefFromTo(assembly, "R13", "R14", 5);
 
     // *ARG = pop()
     assembly.push(`@SP`);
@@ -237,77 +219,21 @@ class VMTranslator {
     assembly.push(`M=D`);
 
     // THAT = *(frame - 1)
-    assembly.push(`@R13`);
-    assembly.push(`A=M`);
-    assembly.push(`A=A-1`);
-    assembly.push(`D=M`);
-    assembly.push(`@THAT`);
-    assembly.push(`M=D`);
+    this.returnDefFromTo(assembly, "R13", "THAT", 1);
 
     // THIS = *(frame - 2)
-    // assembly.push(`D=D-1`);
-    // assembly.push(`@THIS`);
-    // assembly.push(`M=D`);
-    assembly.push(`@R13`);
-    assembly.push(`A=M`);
-    assembly.push(`A=A-1`);
-    assembly.push(`A=A-1`);
-    assembly.push(`D=M`);
-    assembly.push(`@THIS`);
-    assembly.push(`M=D`);
+    this.returnDefFromTo(assembly, "R13", "THIS", 2);
 
     // ARG  = *(frame - 3)
-    // assembly.push(`D=D-1`);
-    // assembly.push(`@ARG`);
-    // assembly.push(`M=D`);
-    assembly.push(`@R13`);
-    assembly.push(`A=M`);
-    assembly.push(`A=A-1`);
-    assembly.push(`A=A-1`);
-    assembly.push(`A=A-1`);
-    assembly.push(`D=M`);
-    assembly.push(`@ARG`);
-    assembly.push(`M=D`);
+    this.returnDefFromTo(assembly, "R13", "ARG", 3);
 
     // LCL  = *(frame - 4)
-    // assembly.push(`D=D-1`);
-    // assembly.push(`@LCL`);
-    // assembly.push(`M=D`);
-    assembly.push(`@R13`);
-    assembly.push(`A=M`);
-    assembly.push(`A=A-1`);
-    assembly.push(`A=A-1`);
-    assembly.push(`A=A-1`);
-    assembly.push(`A=A-1`);
-    assembly.push(`D=M`);
-    assembly.push(`@LCL`);
-    assembly.push(`M=D`);
+    this.returnDefFromTo(assembly, "R13", "LCL", 4);
 
     // returnAddress = *(frame - 5) (stored in R14)
     assembly.push(`@R14`);
     assembly.push(`A=M`);
     assembly.push(`0;JMP\n`);
-
-    // assembly.push(`D=D-1`);
-    // assembly.push(`A=D`);
-    // assembly.push(`0;JMP`);
-
-    // assembly.push(`@R13`);
-    // assembly.push(`A=M`);
-    // assembly.push(`A=A-1`);
-    // assembly.push(`A=A-1`);
-    // assembly.push(`A=A-1`);
-    // assembly.push(`A=A-1`);
-    // assembly.push(`A=A-1`);
-    // assembly.push(`A=M`);
-    // assembly.push(`0;JMP`);
-
-    // assembly.push(`D=M`);
-    // assembly.push(`@THAT`);
-    // assembly.push(`M=D`);
-    // assembly.push(``);
-    // assembly.push(``);
-    // assembly.push(``);
   }
   functionDef(assembly, item) {
     // Function process:
@@ -636,6 +562,16 @@ class VMTranslator {
       if (clean.length > 0) output.push(clean);
     }
     return output;
+  }
+  returnDefFromTo(assembly, from, to, offset) {
+    assembly.push(`@${from}`);
+    assembly.push(`D=M`);
+    assembly.push(`@${offset}`);
+    assembly.push(`D=D-A`);
+    assembly.push(`A=D`);
+    assembly.push(`D=M`);
+    assembly.push(`@${to}`);
+    assembly.push(`M=D`);
   }
   // Push whatever is in the D register onto the stack
   pushD(assembly) {
