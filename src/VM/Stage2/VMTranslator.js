@@ -748,7 +748,6 @@ function isDir(input) {
 }
 
 const inputFile = process.argv[2];
-// let isDir = fs.existsSync(inputFile) && fs.lstatSync(inputFile).isDirectory();
 let files = [];
 let outputFileName = "";
 let BOOTSTRAP = true;
