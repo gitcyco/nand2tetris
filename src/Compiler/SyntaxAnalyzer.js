@@ -8,7 +8,8 @@ class SyntaxAnalyzer {
     console.log("source:", this.source);
     this.line = 0;
     this.cursor = 0;
-    this.tokens = new Map();
+    this.tokens = [];
+    this.escape = { "<": "&lt;", ">": "&gt;", '"': "&quot;", "&": "&amp;" };
     this.keywords = [
       "class",
       "constructor",
@@ -33,11 +34,14 @@ class SyntaxAnalyzer {
       "return",
     ];
     this.parseTokens(this.source);
+    this.xml = this.generateXML();
+    console.log("XML:", this.xml.join("\n"));
   }
   parseTokens(source) {
     while (this.hasMoreChars()) {
       let char = this.getCurrentChar();
       let type = this.charType(char);
+      // console.log("PARSING:", char, type);]
 
       // Process identifiers
       if (type === "CHAR") {
@@ -51,6 +55,14 @@ class SyntaxAnalyzer {
           } else break;
         }
         console.log("IDENTIFIER:", identifier);
+        const obj = { value: identifier };
+        if (this.keywords.includes(identifier)) {
+          obj.type = "keyword";
+        } else {
+          obj.type = "identifier";
+        }
+        this.tokens.push(obj);
+        continue;
       }
 
       // Process numbers
@@ -66,6 +78,9 @@ class SyntaxAnalyzer {
           type = this.charType(char);
         }
         console.log("NUMBER:", +num);
+        const obj = { type: "integerConstant", value: +num };
+        this.tokens.push(obj);
+        continue;
       }
 
       // Process strings
@@ -81,6 +96,10 @@ class SyntaxAnalyzer {
           type = this.charType(char);
         }
         console.log("STRING:", "|" + str + "|");
+        this.advance();
+        const obj = { type: "stringConstant", value: str };
+        this.tokens.push(obj);
+        continue;
       }
 
       // Process symbols
@@ -109,16 +128,34 @@ class SyntaxAnalyzer {
             }
             if (char === "*" && this.peek() === "/") {
               this.advance();
+              char = this.getCurrentChar();
+              type = this.charType(char);
+              console.log("skipping1...", char, this.peek());
               this.advance();
             }
           }
         } else {
           // Process as regular symbol
           console.log("SYMBOL:", char);
+          const obj = { type: "symbol", value: char };
+          if (char in this.escape) obj.value = this.escape[char];
+          this.tokens.push(obj);
+          this.advance();
         }
+        continue;
       }
-
-      this.advance();
+      if (type === "WHITESPACE" || type === "EOL") {
+        this.advance();
+        continue;
+      }
+      if (type === "UNKNOWN") {
+        throw new SyntaxError(
+          `Syntax error at char: ${char} - ${char.charCodeAt(0)} - ${
+            this.cursor
+          }`
+        );
+      }
+      // this.advance();
     }
   }
   getCurrentChar() {
@@ -128,10 +165,6 @@ class SyntaxAnalyzer {
     if (this.cursor < this.source.length) {
       this.cursor++;
     }
-    // if (this.source[this.cursor] === "\n") {
-    //   this.cursor++;
-    //   this.line++;
-    // }
   }
   hasMoreChars() {
     return this.cursor < this.source.length;
@@ -147,8 +180,16 @@ class SyntaxAnalyzer {
     if (/[{}\[\]().,;+\-*\/&|<>=~]/.test(char)) return "SYMBOL";
     if (char === '"') return "DOUBLEQUOTE";
     if (/[ \t]/.test(char)) return "WHITESPACE";
-    if (/\n/.test(char)) return "EOL";
+    if (/[\n\r]/.test(char)) return "EOL";
     return "UNKNOWN";
+  }
+  generateXML() {
+    const xml = ["<tokens>"];
+    for (let token of this.tokens) {
+      xml.push(`<${token.type}> ${token.value} </${token.type}>`);
+    }
+    xml.push("</tokens>");
+    return xml;
   }
   getRawFile(fname) {
     try {
