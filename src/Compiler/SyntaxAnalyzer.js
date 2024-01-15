@@ -4,7 +4,7 @@ const path = require("node:path");
 class SyntaxAnalyzer {
   constructor(file) {
     this.srcName = path.basename(file, ".jack");
-    this.source = this.getRawFile(file).split("\n");
+    this.source = this.getRawFile(file).replace(/\n\r?/g, "\n");
     console.log("source:", this.source);
     this.line = 0;
     this.cursor = 0;
@@ -12,20 +12,97 @@ class SyntaxAnalyzer {
     this.parseTokens(this.source);
   }
   parseTokens(source) {
-    for (let line of source) {
-      for (let c of line) {
-        console.log(this.charType(c), c);
+    while (this.hasMoreChars()) {
+      // "class","constructor","function","method","field","static","var","int","char","boolean","void",
+      // "true","false","null","this","let","do","if","else","while","return"
+      let char = this.getCurrentChar();
+      let type = this.charType(char);
+
+      // Process identifiers
+      if (type === "CHAR") {
+        let identifier = char;
+        while (this.hasMoreChars()) {
+          this.advance();
+          char = this.getCurrentChar();
+          type = this.charType(char);
+          if (type !== "EOL" && (type === "CHAR" || type === "INT")) {
+            identifier += char;
+          } else break;
+        }
+        console.log("IDENTIFIER:", identifier);
       }
+
+      // Process strings
+      if (type === "DOUBLEQUOTE") {
+        let str = "";
+        this.advance();
+        char = this.getCurrentChar();
+        type = this.charType(char);
+        while (type !== "DOUBLEQUOTE" && this.hasMoreChars()) {
+          str += char;
+          this.advance();
+          char = this.getCurrentChar();
+          type = this.charType(char);
+        }
+        console.log("STRING:", "|" + str + "|");
+      }
+
+      // Process symbols
+      if (type === "SYMBOL") {
+        if (char === "/") {
+          let lookAhead = this.peek();
+          console.log("found slash:::::::", char, lookAhead);
+          if (lookAhead === "/") {
+            // Single line comment, skip everything to the end of the line
+            while (type !== "EOL" && this.hasMoreChars()) {
+              this.advance();
+              char = this.getCurrentChar();
+              type = this.charType(char);
+              console.log("CHAR:", char, type, char.charCodeAt(0));
+            }
+          } else if (lookAhead === "*") {
+            console.log("FOUND MULTILINE::::::", char, this.peek());
+            // Multi line comment, skip everything to the end of the comment (*/)
+            while (
+              !(char === "*" && this.peek() === "/") &&
+              this.hasMoreChars()
+            ) {
+              this.advance();
+              char = this.getCurrentChar();
+              type = this.charType(char);
+              console.log("char:", char);
+            }
+            if (char === "*" && this.peek() === "/") {
+              this.advance();
+              this.advance();
+            }
+          } else {
+            // This is a normal / so treat as division symbol
+          }
+        }
+      }
+
+      this.advance();
     }
   }
   getCurrentChar() {
-    return this.source(this.cursor);
+    return this.source[this.cursor];
   }
   advance() {
-    this.cursor++;
+    if (this.cursor < this.source.length) {
+      this.cursor++;
+    }
+    // if (this.source[this.cursor] === "\n") {
+    //   this.cursor++;
+    //   this.line++;
+    // }
   }
   hasMoreChars() {
     return this.cursor < this.source.length;
+  }
+  peek() {
+    if (this.hasMoreChars()) return this.source[this.cursor + 1];
+    return null;
   }
   charType(char) {
     if (/[a-z_]/i.test(char)) return "CHAR";
@@ -33,7 +110,8 @@ class SyntaxAnalyzer {
     // { } [ ] ( ) . , ; + - * / & | < > = ~
     if (/[{}\[\]().,;+\-*\/&|<>=~]/.test(char)) return "SYMBOL";
     if (char === '"') return "DOUBLEQUOTE";
-    if (/\s/.test(char)) return "WHITESPACE";
+    if (/[ \t]/.test(char)) return "WHITESPACE";
+    if (/\n/.test(char)) return "EOL";
     return "UNKNOWN";
   }
   getRawFile(fname) {
