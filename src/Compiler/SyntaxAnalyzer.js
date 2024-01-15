@@ -8,13 +8,34 @@ class SyntaxAnalyzer {
     console.log("source:", this.source);
     this.line = 0;
     this.cursor = 0;
-    this.tokens = {};
+    this.tokens = new Map();
+    this.keywords = [
+      "class",
+      "constructor",
+      "function",
+      "method",
+      "field",
+      "static",
+      "var",
+      "int",
+      "char",
+      "boolean",
+      "void",
+      "true",
+      "false",
+      "null",
+      "this",
+      "let",
+      "do",
+      "if",
+      "else",
+      "while",
+      "return",
+    ];
     this.parseTokens(this.source);
   }
   parseTokens(source) {
     while (this.hasMoreChars()) {
-      // "class","constructor","function","method","field","static","var","int","char","boolean","void",
-      // "true","false","null","this","let","do","if","else","while","return"
       let char = this.getCurrentChar();
       let type = this.charType(char);
 
@@ -30,6 +51,21 @@ class SyntaxAnalyzer {
           } else break;
         }
         console.log("IDENTIFIER:", identifier);
+      }
+
+      // Process numbers
+      if (type === "INT") {
+        let num = char;
+        this.advance();
+        char = this.getCurrentChar();
+        type = this.charType(char);
+        while (type === "INT" && this.hasMoreChars()) {
+          num += char;
+          this.advance();
+          char = this.getCurrentChar();
+          type = this.charType(char);
+        }
+        console.log("NUMBER:", +num);
       }
 
       // Process strings
@@ -49,19 +85,18 @@ class SyntaxAnalyzer {
 
       // Process symbols
       if (type === "SYMBOL") {
-        if (char === "/") {
-          let lookAhead = this.peek();
-          console.log("found slash:::::::", char, lookAhead);
+        let lookAhead = this.peek();
+        if (char === "/" && (lookAhead === "/" || lookAhead === "*")) {
+          // console.log("found slash:::::::", char, lookAhead);
           if (lookAhead === "/") {
             // Single line comment, skip everything to the end of the line
             while (type !== "EOL" && this.hasMoreChars()) {
               this.advance();
               char = this.getCurrentChar();
               type = this.charType(char);
-              console.log("CHAR:", char, type, char.charCodeAt(0));
+              // console.log("CHAR:", char, type, char.charCodeAt(0));
             }
           } else if (lookAhead === "*") {
-            console.log("FOUND MULTILINE::::::", char, this.peek());
             // Multi line comment, skip everything to the end of the comment (*/)
             while (
               !(char === "*" && this.peek() === "/") &&
@@ -70,15 +105,16 @@ class SyntaxAnalyzer {
               this.advance();
               char = this.getCurrentChar();
               type = this.charType(char);
-              console.log("char:", char);
+              // console.log("char:", char);
             }
             if (char === "*" && this.peek() === "/") {
               this.advance();
               this.advance();
             }
-          } else {
-            // This is a normal / so treat as division symbol
           }
+        } else {
+          // Process as regular symbol
+          console.log("SYMBOL:", char);
         }
       }
 
