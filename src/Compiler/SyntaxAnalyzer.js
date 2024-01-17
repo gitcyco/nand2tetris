@@ -1,7 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-class SyntaxAnalyzer {
+class Tokenizer {
   constructor(file) {
     this.srcName = path.basename(file, ".jack");
     this.source = this.getRawFile(file).replace(/\n\r?/g, "\n");
@@ -208,7 +208,7 @@ class SyntaxAnalyzer {
 
 function processInput(inputFile, files) {
   for (let file of files) {
-    const analyzer = new SyntaxAnalyzer(file);
+    const analyzer = new Tokenizer(file);
   }
 }
 
