@@ -1,6 +1,47 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
+class Parser {
+  constructor(tokens) {
+    this.tokens = tokens;
+    this.tokenIndex = 0;
+  }
+  consumeToken(value) {
+    const token = this.getToken();
+    if (token.value === value) {
+      this.advance();
+    } else {
+      throw new SyntaxError(
+        `Expected: ${value} but ingested invalid token: ${token}`
+      );
+    }
+  }
+  compileClass() {}
+  compileClassVarDev() {}
+  compileSubroutine() {}
+  compileParameterList() {}
+  compileSubroutineBody() {}
+  compileVarDec() {}
+  compileStatements() {}
+  compileLet() {}
+  compileIf() {}
+  compileWhile() {}
+  compileDo() {}
+  compileReturn() {}
+  compileExpression() {}
+  compileTerm() {}
+  compileExpressionList() {}
+
+  getToken() {
+    return this.tokens[this.tokenIndex];
+  }
+  advance() {
+    if (this.tokenIndex < this.tokens.length - 1) {
+      this.tokenIndex++;
+    }
+  }
+}
+
 class Tokenizer {
   constructor(file) {
     this.srcName = path.basename(file, ".jack");
@@ -208,7 +249,8 @@ class Tokenizer {
 
 function processInput(inputFile, files) {
   for (let file of files) {
-    const analyzer = new Tokenizer(file);
+    const tokenizer = new Tokenizer(file);
+    const parser = new Parser(tokenizer.tokens);
   }
 }
 
