@@ -5,6 +5,12 @@ class Parser {
   constructor(tokens) {
     this.tokens = tokens;
     this.tokenIndex = 0;
+    this.AST = { classes: [] };
+    this.classVarDecKeywords = ["static", "field"];
+    this.subroutineDecKeywords = ["constructor", "function", "method"];
+    this.typeKeywords = ["int", "char", "boolean"];
+    console.log("parsing tokens:", this.tokens);
+    this.compileClass(this.tokens);
   }
   consumeToken(value) {
     const token = this.getToken();
@@ -12,16 +18,80 @@ class Parser {
       this.advance();
     } else {
       throw new SyntaxError(
-        `Expected: ${value} but ingested invalid token: ${token}`
+        `Expected: ${value} but ingested invalid token: ${JSON.stringify(
+          token
+        )}`
       );
     }
   }
-  compileClass() {}
-  compileClassVarDev() {}
-  compileSubroutine() {}
+  // class: 'class' className '{' classVarDec* subRoutineDec* '}'
+  compileClass() {
+    this.consumeToken("class");
+    const classObj = { type: "class", children: [] };
+    this.AST.classes.push(classObj);
+    const className = this.getToken();
+    if (className.type === "identifier") {
+      classObj.name = className.value;
+      this.advance();
+    } else {
+      throw new SyntaxError(`Expected className, instead got: ${className}`);
+    }
+    this.consumeToken("{");
+    while (this.hasMoreTokens()) {
+      while (this.compileClassVarDec(classObj));
+      // this.compileClassVarDec(classObj);
+      // this.compileSubroutine(classObj);
+      break;
+    }
+    console.log(JSON.stringify(this.AST));
+    this.consumeToken("}");
+  }
+  // classVarDec: ('static'|'field') type varNAme (',' varname)* ';'
+  compileClassVarDec(classObj) {
+    const token = this.getToken();
+    if (
+      token.type === "keyword" &&
+      this.classVarDecKeywords.includes(token.value)
+    ) {
+      const obj = { type: "classVarDec", children: [] };
+      this.advance();
+      const type = this.getToken();
+      obj.varType = type.value;
+      this.advance();
+      while (this.getToken().value !== ";") {
+        const varToken = this.getToken();
+        console.log("varToken:", varToken);
+        obj.children.push({ varName: varToken.value });
+        this.advance();
+        if (this.getToken().value === ",") {
+          this.consumeToken(",");
+        }
+      }
+      classObj.children.push(obj);
+      this.consumeToken(";");
+      return true;
+    }
+    return false;
+  }
+  // subroutineDec: ('constructor'|'function'|'method) ('void'|type) subroutineName '(' parameterList ')' subroutineBody
+  compileSubroutine(classObj) {}
+
+  // parameterList: ((type varName) (',' type varName)*)?
   compileParameterList() {}
+
+  // subroutineBody: '{' varDec* statements '}'
   compileSubroutineBody() {}
+
+  // varDec: 'var' type varName (',' varName)* ';'
   compileVarDec() {}
+
+  // statements:      statement*
+  // statement:       letStatement | ifStatement | whileStatement | doStatement | returnStatement
+  // letStatement:    'let' varName ('[' expression ']')? '=' expression ';'
+  // ifStatement:     'if' '(' expression ')' '{' statements '}' ('else' '{' statements '}')?
+  // whileStatement:  'while' '(' expression ')' '{' statements '}'
+  // doStatement:     'do' subroutineCall ';'
+  // returnStatement: 'return' expression? ';'
   compileStatements() {}
   compileLet() {}
   compileIf() {}
@@ -31,14 +101,21 @@ class Parser {
   compileExpression() {}
   compileTerm() {}
   compileExpressionList() {}
-
+  peek() {
+    if (this.tokenIndex < this.tokens.length - 1) {
+      return this.tokens[this.tokenIndex + 1];
+    } else return null;
+  }
   getToken() {
     return this.tokens[this.tokenIndex];
   }
   advance() {
-    if (this.tokenIndex < this.tokens.length - 1) {
+    if (this.tokenIndex < this.tokens.length) {
       this.tokenIndex++;
     }
+  }
+  hasMoreTokens() {
+    return this.tokenIndex < this.tokens.length - 1;
   }
 }
 
