@@ -98,7 +98,16 @@ class Parser {
   compileWhile() {}
   compileDo() {}
   compileReturn() {}
+
+  // expression: term (op term)*
   compileExpression() {}
+
+  // term: integerConstant | stringConstant | keywordConstant | varName | varName '[' expression ']' | '(' expression ')' | (unaryOp term) | subroutineCall
+  // subroutineCall: subroutineName '(' expressionList ')' | (className | varName) '.' subroutineName '(' expressionList ')'
+  // expressionList: (expression (',' expression )* )?
+  // op: '+' | '-' | '*' | '/' | '&' | '|' | '<' | '>' | '='
+  // unaryOp: '-' | '~'
+  // keywordConstant: 'true' | 'false' | 'null' | 'this'
   compileTerm() {}
   compileExpressionList() {}
   peek() {
